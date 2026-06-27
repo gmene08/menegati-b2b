@@ -1,0 +1,37 @@
+package br.com.menegati.brb_revendedoras.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Data
+@Entity
+@Table(name = "produto")
+public class Produto {
+
+    @Id
+    @Column(length = 50) // Armazena o código SKU (Ex: 104994) do sistema legado
+    private String codigo;
+
+    @Column(nullable = false)
+    private String nome;
+
+    @Column(name = "preco_venda", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precoVenda;
+
+    //Controla o que está fisicamente na loja, pronto para ir para uma nova maleta
+    @Column(name = "quantidade_disponivel", nullable = false)
+    private Integer quantidadeDisponivel = 0;
+
+    private String ncm;
+
+    private boolean ativo = true;
+
+    @Column(name = "ultima_atualizacao")
+    private LocalDateTime ultimaAtualizacao = LocalDateTime.now();
+}

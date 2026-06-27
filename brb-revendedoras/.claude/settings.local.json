@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"E:\\\\projetos\\\\MenegatiJoias\\\\brb-revendedoras\" -type f -name \"*.java\" -exec grep -l \"UserDetailsService\\\\|AuthenticationProvider\\\\|UserDetails\" {} \\\\;)",
+      "Bash(find \"E:\\\\projetos\\\\MenegatiJoias\\\\brb-revendedoras\" -type f -name \"*.java\" -exec grep -l \"def authenticate\\\\|authenticate\\(\" {} \\\\;)",
+      "Bash(find \"E:\\\\projetos\\\\MenegatiJoias\\\\brb-revendedoras\" -type f -name \"*.java\" -exec grep -l \"implements\\\\|extends\" {} \\\\;)",
+      "Bash(find \"E:\\\\projetos\\\\MenegatiJoias\\\\brb-revendedoras\" -type f \\\\\\( -name \"*.yml\" -o -name \"*.yaml\" -o -name \"*.properties\" \\\\\\) -exec ls -la {} \\\\;)",
+      "Bash(xargs grep *)"
+    ]
+  }
+}

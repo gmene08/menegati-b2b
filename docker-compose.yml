@@ -1,0 +1,18 @@
+
+services:
+  mysql-menegati:
+    image: mysql:8.0
+    container_name: mysql-menegati-b2b
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: menegati_b2b
+      MYSQL_USER: admin_menegati
+      MYSQL_PASSWORD: fati1508
+    ports:
+      - "3311:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
