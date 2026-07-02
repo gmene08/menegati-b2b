@@ -16,12 +16,12 @@ public class ItemConsignacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "lote_id", nullable = false)
     private LoteConsignação lote;
 
-    @ManyToOne
-    @JoinColumn(name = "produto_id", nullable = false)
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "produto_codigo", nullable = false)
     private Produto produto;
 
     @Column(name = "quantidade", nullable = false)

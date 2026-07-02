@@ -28,7 +28,18 @@ public class Produto {
     @Column(name = "quantidade_disponivel", nullable = false)
     private Integer quantidadeDisponivel = 0;
 
+    @Column(name = "barras", nullable = true)
+    private String barras;
+
+    @Column(name = "cest", nullable = true)
+    private String cest;
+
+    @Column(name = "unidade", nullable = true)
+    private String unidade;
+
+    @Column(name = "ncm", nullable = true)
     private String ncm;
+
 
     private boolean ativo = true;
 

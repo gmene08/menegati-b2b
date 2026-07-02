@@ -20,7 +20,7 @@ public class LoteConsignação {
     @Column(name = "numero_documento", nullable = false, unique = true)
     private String numeroDocumento; // Ex: 2000047 vindos do PDF
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "revendedora_id", nullable = false)
     private Revendedor revendedora;
 
