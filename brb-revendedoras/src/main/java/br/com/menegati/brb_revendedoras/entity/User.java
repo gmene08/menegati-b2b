@@ -2,7 +2,10 @@ package br.com.menegati.brb_revendedoras.entity;
 
 import br.com.menegati.brb_revendedoras.enums.Role;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +16,8 @@ import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
+@SuperBuilder
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User implements UserDetails {
@@ -50,13 +55,9 @@ public abstract class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        if(this.role == Role.ADMIN) {
-            return List.of(new SimpleGrantedAuthority("ROLE_" + Role.ADMIN.name()));
-        } else {
-            return List.of(new SimpleGrantedAuthority("ROLE_" + Role.REVENDEDOR.name()));
-        }
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
     }
+
     @Override
     public String getPassword() {
         return this.password;

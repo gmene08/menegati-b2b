@@ -2,7 +2,10 @@ package br.com.menegati.brb_revendedoras.entity;
 
 import br.com.menegati.brb_revendedoras.enums.StatusLote;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,18 +14,18 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "lote_consignação")
-public class LoteConsignação {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "lote_consignacao")
+public class LoteConsignacao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "numero_documento", nullable = false, unique = true)
-    private String numeroDocumento; // Ex: 2000047 vindos do PDF
-
     @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn(name = "revendedora_id", nullable = false)
-    private Revendedor revendedora;
+    @JoinColumn(name = "revendedor_id", nullable = false)
+    private Revendedor revendedor;
 
     @Column(name = "data_abertura", nullable = false)
     private LocalDateTime dataAbertura = LocalDateTime.now();

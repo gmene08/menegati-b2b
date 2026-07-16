@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ public class AuthServiceTest {
 
         RegisterRequestDTO dto = new RegisterRequestDTO(
                 "12345678900", "senha123", "João Cliente",
-                "joao@email.com", "99999999", LocalDateTime.now()
+                "joao@email.com", "99999999", LocalDate.now()
         );
 
         when(userRepository.existsByCpf(dto.cpf())).thenReturn(false);
@@ -70,7 +71,7 @@ public class AuthServiceTest {
 
         RegisterRequestDTO dto = new RegisterRequestDTO(
                 "11122233344", "senha123", "Eucineia Revendedora",
-                "euci@email.com", "88888888", LocalDateTime.now()
+                "euci@email.com", "88888888", LocalDate.now()
         );
 
         when(userRepository.existsByCpf(dto.cpf())).thenReturn(false);
@@ -82,7 +83,7 @@ public class AuthServiceTest {
         verify(userRepository, times(1)).save(userCaptor.capture());
 
         User user = userCaptor.getValue();
-        assertTrue(user instanceof Revendedor, "Usuario salvo deve ser do tipo REVENDEDOR");
+        assertInstanceOf(Revendedor.class, user, "Usuario salvo deve ser do tipo REVENDEDOR");
         assertEquals(dto.cpf(), user.getCpf(), "CPF do usuario salvo deve ser igual ao informado no DTO");
         assertEquals(dto.name(), user.getName(), "Nome do usuario salvo deve ser igual ao informado no DTO");
         assertEquals("senhaEncriptada", user.getPassword(), "Senha do usuario salvo deve ser igual a senha encriptada");
@@ -95,7 +96,7 @@ public class AuthServiceTest {
     void deveLancarExcecaoAoRegistrarComCpfJaExistente(){
 
         RegisterRequestDTO dto = new RegisterRequestDTO(
-                "12345678900", "senha", "Copião", "copia@email", "000", LocalDateTime.now()
+                "12345678900", "senha", "Copião", "copia@email", "000", LocalDate.now()
         );
 
         when(userRepository.existsByCpf(dto.cpf())).thenReturn(true);

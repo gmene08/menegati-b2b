@@ -21,7 +21,7 @@ public enum StatusItemLote {
     ACERTADO_VENDIDO,
 
     /**
-     * Devolução Automática: O Admin subiu o Arquivo 3 (Acerto Final) e este produto
+     * Devolução Automática: O Admin fechou a maleta e este produto
      * NÃO constava na lista de vendidos. O sistema altera o status para DEVOLVIDO
      * e soma a quantidade de volta ao estoque global do produto.
      */
