@@ -33,7 +33,7 @@ public class LoteService {
     private final ItemConsignacaoRepository itemConsignacaoRepository;
     private final DocumentoMaletaRepository documentoMaletaRepository;
 
-    public static final String REGEX_LINHAS_PRODUTOS = "^(\\d{6})\\s+([\\s\\S]+?)\\s+([0-9.,]+)\\s+([0-9.,]+)\\s+([0-9.,]+)$";
+    public static final String REGEX_LINHAS_PRODUTOS = "^\\s*(\\d{6})\\s+([\\s\\S]+?)\\s+([0-9.,]+)\\s+([0-9.,]+)\\s+([0-9.,]+)\\s*$";
 
     public record ProcessamentoLoteResult(LoteConsignacao lote, Map<Long, String> produtosAlertas, BigDecimal valorTotalDestePdf, int numeroDePecasDestePdf) {}
 
@@ -252,7 +252,7 @@ public class LoteService {
     public String extrairTextoDoPdf(MultipartFile file) {
         try (PDDocument pdfDocument = PDDocument.load(file.getInputStream())){
             PDFTextStripper stripper = new PDFTextStripper();
-            return stripper.getText(pdfDocument);
+            return stripper.getText(pdfDocument).replace('\u00A0', ' ');
         } catch (IOException e) {
             log.error("Erro ao processar arquivo PDF: {}", e.getMessage());
             throw new BusinessException("Erro ao processar arquivo PDF: " + e.getMessage());

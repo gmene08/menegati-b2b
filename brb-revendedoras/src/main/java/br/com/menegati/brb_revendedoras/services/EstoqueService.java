@@ -76,6 +76,7 @@ public class EstoqueService {
 
                     produto.setUltimaAtualizacao(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()));
 
+                    log.info("Produto {} da linha {} salvo com sucesso", codigo, record.getRecordNumber());
                     produtosParaSalvar.add(produto);
 
                 } catch (Exception e){
