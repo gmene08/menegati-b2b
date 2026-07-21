@@ -1,0 +1,18 @@
+<div class="flex min-h-screen w-full flex-col bg-paper text-ink [overflow-anchor:none]">
+
+  <!-- Só mostra o Header B2C se NÃO estivermos no Dashboard -->
+  @if (mostrarHeaderPadrao) {
+    <app-header></app-header>
+  }
+
+  <!-- Aqui é onde as páginas são carregadas -->
+  <main class="w-full flex-1">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Só mostra o Footer B2C se NÃO estivermos no Dashboard -->
+  @if (mostrarHeaderPadrao) {
+    <app-footer></app-footer>
+  }
+
+</div>

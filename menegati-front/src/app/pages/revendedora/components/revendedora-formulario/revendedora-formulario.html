@@ -1,0 +1,87 @@
+<section
+  id="formulario-revendedora"
+  class="relative w-full overflow-hidden bg-ink py-20 text-paper md:py-28"
+>
+  <!-- Elemento decorativo subtil no fundo -->
+  <div
+    class="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-dark opacity-20 blur-[120px]"
+  ></div>
+
+  <div class="content-container relative z-10 flex flex-col items-center px-5 md:px-8">
+    <div class="max-w-2xl text-center">
+      <p class="eyebrow text-brand-light">Comece agora</p>
+      <h2 class="mt-2 font-brand text-3xl text-paper md:text-4xl">Dê o primeiro passo</h2>
+      <p class="mt-4 text-[15px] text-line">
+        Preencha os seus dados. A nossa equipa entrará em contacto consigo para avaliar o seu
+        perfil, apresentar todos os detalhes e preparar a sua primeira maleta.
+      </p>
+    </div>
+
+    <form class="mt-10 w-full max-w-xl space-y-5 text-left">
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div>
+          <label class="mb-1.5 block text-[13px] font-medium text-line" for="nome">
+            Nome completo
+          </label>
+          <input
+            id="nome"
+            type="text"
+            class="w-full rounded-sm border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-paper
+                   placeholder-white/30 transition-colors focus:border-brand focus:outline-none"
+            placeholder="Ex: Maria Silva"
+          />
+        </div>
+        <div>
+          <label class="mb-1.5 block text-[13px] font-medium text-line" for="telemovel">
+            Telemóvel (WhatsApp)
+          </label>
+          <input
+            id="telemovel"
+            type="tel"
+            class="w-full rounded-sm border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-paper
+                   placeholder-white/30 transition-colors focus:border-brand focus:outline-none"
+            placeholder="+55 (XX) 9XXXX-XXXX"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label class="mb-1.5 block text-[13px] font-medium text-line" for="email">E-mail</label>
+        <input
+          id="email"
+          type="email"
+          class="w-full rounded-sm border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-paper
+                 placeholder-white/30 transition-colors focus:border-brand focus:outline-none"
+          placeholder="o.seu@email.com"
+        />
+      </div>
+
+      <div>
+        <label class="mb-1.5 block text-[13px] font-medium text-line" for="cidade">
+          Cidade / Estado
+        </label>
+        <input
+          id="cidade"
+          type="text"
+          class="w-full rounded-sm border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-paper
+                 placeholder-white/30 transition-colors focus:border-brand focus:outline-none"
+          placeholder="Ex: Campo Grande - MS"
+        />
+      </div>
+
+      <div class="pt-4">
+        <button
+          type="button"
+          class="flex h-14 w-full items-center justify-center rounded-sm bg-brand text-[14px] font-medium
+                 tracking-wide text-white transition-all duration-300 hover:bg-white hover:text-brand"
+        >
+          Enviar pedido de avaliação
+        </button>
+      </div>
+
+      <p class="mt-4 text-center text-[12px] text-white/40">
+        Os seus dados estão seguros connosco e serão utilizados apenas para contacto comercial.
+      </p>
+    </form>
+  </div>
+</section>

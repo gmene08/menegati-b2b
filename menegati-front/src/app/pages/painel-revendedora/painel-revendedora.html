@@ -1,0 +1,24 @@
+<div class="flex min-h-screen w-full flex-col bg-paper-soft font-body">
+  <app-painel-header
+    [revendedora]="revendedora"
+    [abaAtiva]="abaAtiva()"
+    (abaChange)="mudarAba($event)"
+  ></app-painel-header>
+
+  <main class="content-container w-full flex-1 px-5 py-8 md:px-8 md:py-12">
+    @switch (abaAtiva()) {
+      @case ('visao-geral') {
+        <app-visao-geral [revendedora]="revendedora" [lote]="lote" [itens]="itens()"></app-visao-geral>
+      }
+      @case ('maleta') {
+        <app-minha-maleta [itens]="itens()" (vendido)="marcarComoVendido($event)"></app-minha-maleta>
+      }
+      @case ('historico') {
+        <app-historico-acertos [historico]="historico"></app-historico-acertos>
+      }
+      @case ('material') {
+        <app-material-apoio></app-material-apoio>
+      }
+    }
+  </main>
+</div>

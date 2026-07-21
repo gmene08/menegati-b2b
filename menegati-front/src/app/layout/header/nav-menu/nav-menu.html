@@ -1,0 +1,29 @@
+<div
+  class="sticky top-[var(--header-utility-h)] z-40 hidden h-[var(--header-nav-h)]
+         w-full border-b border-line bg-paper md:block shadow-[0_4px_6px_-3px_rgba(0,0,0,0.1)]"
+>
+  <nav
+    aria-label="Categorias"
+    class="content-container flex h-full items-center justify-between gap-6 px-4
+           text-[13.5px] font-medium tracking-[0.03em] text-ink-soft lg:gap-10"
+  >
+    @for (category of categories; track category.label) {
+      <a href="{{ category.href }}" class="group flex items-center gap-1.5 transition-colors hover:text-brand">
+        <span>{{ category.label }}</span>
+        <svg
+          class="h-3 w-3 text-ink-soft/50 transition-colors group-hover:text-brand"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </a>
+    }
+
+    <a routerLink="/revendedora" class="text-brand transition-opacity hover:opacity-70">
+      Acesso Revendedora
+    </a>
+  </nav>
+</div>

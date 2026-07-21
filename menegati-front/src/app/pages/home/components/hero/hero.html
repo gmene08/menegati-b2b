@@ -1,0 +1,21 @@
+<section class="w-full bg-paper-soft">
+  <div
+    class="content-container flex flex-col items-center justify-center gap-10 px-5 py-14
+           md:px-5 md:py-16 lg:flex-row lg:items-center lg:gap-16 lg:py-20"
+  >
+    <!-- Conteúdo à esquerda -->
+    <article class="mx-auto w-full max-w-[610px] lg:mx-0 lg:flex-1">
+      <app-presentation-article></app-presentation-article>
+    </article>
+
+    <!-- Vídeo vertical à direita -->
+    <div class="flex w-full items-center justify-center lg:w-[40%] lg:shrink-0 lg:justify-end">
+      <div
+        class="relative aspect-[9/16] w-full max-w-[330px] overflow-hidden rounded-sm border
+               border-line bg-ink shadow-[0_24px_60px_-32px_rgba(45,34,49,0.45)] xl:max-w-[360px]"
+      >
+        <app-presentation-video class="absolute inset-0 block h-full w-full"></app-presentation-video>
+      </div>
+    </div>
+  </div>
+</section>

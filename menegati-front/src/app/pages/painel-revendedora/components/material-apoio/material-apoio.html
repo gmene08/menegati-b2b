@@ -1,0 +1,39 @@
+<div class="mb-8">
+  <h2 class="font-brand text-3xl text-ink">Material de Apoio</h2>
+  <p class="mt-1 text-[14px] text-ink-soft">
+    Conteúdos para lhe ajudar a apresentar e vender as peças da sua maleta.
+  </p>
+</div>
+
+<div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+  @for (material of materiais; track material.titulo) {
+    <a
+      href="#"
+      class="group flex items-start gap-4 rounded-sm border border-line bg-paper p-6 shadow-sm
+             transition-colors hover:border-brand"
+    >
+      <span
+        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand
+               transition-transform duration-300 group-hover:scale-110"
+      >
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="material.icone" />
+        </svg>
+      </span>
+      <div class="flex-1">
+        <h3 class="font-brand text-lg text-ink">{{ material.titulo }}</h3>
+        <p class="mt-1 text-[13.5px] leading-relaxed text-ink-soft">{{ material.descricao }}</p>
+        <span class="mt-3 inline-flex items-center gap-1.5 text-[12px] font-medium text-brand">
+          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
+          </svg>
+          {{ material.formato }}
+        </span>
+      </div>
+    </a>
+  }
+</div>

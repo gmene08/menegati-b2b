@@ -1,0 +1,71 @@
+<div class="w-full bg-paper">
+  <div class="content-container px-4 md:px-8">
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center py-3 md:py-4">
+      <!-- Esquerda: menu mobile -->
+      <div class="justify-self-start">
+        <button
+          type="button"
+          class="flex h-9 w-9 items-center justify-center text-ink md:hidden"
+          [attr.aria-expanded]="menuOpen()"
+          aria-label="Abrir menu de navegação"
+          (click)="toggleMenu()"
+        >
+          @if (menuOpen()) {
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          } @else {
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          }
+        </button>
+      </div>
+
+      <!-- Logo central -->
+      <a routerLink="/" class="block justify-self-center" aria-label="Menegati Joias e Semijoias — página inicial">
+        <img
+          src="/logo-menegati.png"
+          alt="Menegati Joias e Semijoias"
+          class="block h-auto w-[160px] object-contain md:w-[190px]"
+        />
+      </a>
+
+      <!-- Direita vazia para manter o logo centralizado -->
+      <div aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <!-- Painel de navegação mobile -->
+  @if (menuOpen()) {
+    <div class="border-t border-line bg-paper md:hidden">
+      <nav aria-label="Categorias" class="content-container flex flex-col px-5 py-2">
+        @for (category of categories; track category.label) {
+          <a
+            href="{{ category.href }}"
+            class="border-b border-line py-3.5 text-[15px] text-ink"
+            (click)="closeMenu()"
+          >
+            {{ category.label }}
+          </a>
+        }
+        <a routerLink="/revendedora" class="border-b border-line py-3.5 text-[15px] text-brand" (click)="closeMenu()">
+          Acesso Revendedora
+        </a>
+      </nav>
+
+      <div class="content-container flex flex-col gap-3 px-5 py-5 text-[14px] text-ink-soft">
+        <a href="#agendamento" class="transition-colors hover:text-brand" (click)="closeMenu()">
+          Agendar atendimento
+        </a>
+        <a href="tel:+556799673170" class="transition-colors hover:text-brand">+55 67 9967-3170</a>
+        <a href="mailto:contato@menegati.com.br" class="transition-colors hover:text-brand">
+          contato&#64;menegati.com.br
+        </a>
+        <a routerLink="/painel-revendedora" class="transition-colors hover:text-brand" (click)="closeMenu()">
+          Painel da Revendedora
+        </a>
+      </div>
+    </div>
+  }
+</div>

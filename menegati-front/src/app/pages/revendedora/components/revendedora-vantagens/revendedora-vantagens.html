@@ -1,0 +1,35 @@
+<section class="w-full bg-paper py-20 md:py-28">
+  <div class="content-container px-5 md:px-8">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="eyebrow text-brand">Porquê ser parceira</p>
+      <h2 class="mt-2 font-brand text-3xl text-ink md:text-4xl">Vantagens de ser Menegati</h2>
+      <p class="mt-4 text-[15px] text-ink-soft">
+        Desenhámos um sistema transparente e rentável para que a sua única preocupação seja
+        encantar as clientes.
+      </p>
+    </div>
+
+    <div class="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      @for (vantagem of vantagens; track vantagem.titulo) {
+        <div
+          class="group flex flex-col items-center rounded-sm border border-line bg-paper-soft p-8
+                 text-center transition-colors duration-300 hover:border-brand"
+        >
+          <span
+            class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-brand
+                   shadow-[0_10px_24px_-16px_rgba(45,34,49,0.35)] transition-transform duration-300
+                   group-hover:scale-110"
+          >
+            <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" [attr.d]="vantagem.icone" />
+            </svg>
+          </span>
+          <h3 class="mt-6 font-brand text-xl text-ink">{{ vantagem.titulo }}</h3>
+          <p class="mt-3 text-[14.5px] leading-relaxed text-ink-soft">
+            {{ vantagem.descricao }}
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</section>

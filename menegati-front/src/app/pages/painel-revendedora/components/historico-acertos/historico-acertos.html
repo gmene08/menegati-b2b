@@ -1,0 +1,50 @@
+<div class="mb-8">
+  <h2 class="font-brand text-3xl text-ink">Histórico de Acertos</h2>
+  <p class="mt-1 text-[14px] text-ink-soft">
+    Registo das últimas cargas recebidas e acertos realizados com a loja.
+  </p>
+</div>
+
+<div class="rounded-sm border border-line bg-paper shadow-sm">
+  <ul class="divide-y divide-line">
+    @for (registo of historico(); track registo.id) {
+      <li class="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-start gap-4">
+          <span
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+            [class]="
+              registo.tipoDocumento === 'MALETA_ACERTO'
+                ? 'bg-emerald-50 text-emerald-600'
+                : 'bg-brand-light text-brand'
+            "
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="icone(registo.tipoDocumento)" />
+            </svg>
+          </span>
+          <div>
+            <p class="font-medium text-ink">{{ tipoLabel[registo.tipoDocumento] }}</p>
+            <p class="mt-0.5 text-[13px] text-ink-soft">
+              Consignação Nº {{ registo.numeroConsignacao }} · {{ registo.dataProcessamento }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 pl-15 text-[13px] sm:pl-0">
+          <div class="text-right">
+            <p class="text-ink-soft">Peças</p>
+            <p class="font-medium text-ink">{{ registo.totalPecas }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-ink-soft">Valor</p>
+            <p class="font-medium text-ink">{{ registo.valorTotal | currency: 'BRL' }}</p>
+          </div>
+        </div>
+      </li>
+    } @empty {
+      <li class="px-6 py-10 text-center text-[14px] text-ink-soft">
+        Ainda não há registos de cargas ou acertos.
+      </li>
+    }
+  </ul>
+</div>
