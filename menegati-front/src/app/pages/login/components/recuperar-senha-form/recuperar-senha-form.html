@@ -1,0 +1,84 @@
+@if (!message()) {
+  <!-- ============================================== -->
+    <!-- ESTADO 1: FORMULÁRIO (Ainda não foi enviado)   -->
+    <!-- ============================================== -->
+  <div class="mb-8">
+    <h1 class="font-brand text-[28px] leading-tight tracking-wide text-ink sm:text-[32px]">
+      Recupere sua senha
+    </h1>
+    <p class="mt-2 text-[15px] leading-relaxed text-ink-soft">
+      Um código será enviado para o e-mail cadastrado na conta.
+    </p>
+  </div>
+
+  <app-error-message [message]="errorMessage()" />
+
+  <form (ngSubmit)="recuperarSenha()" class="space-y-7">
+    <div>
+      <div class="mb-2 flex items-center justify-between gap-4">
+        <label for="login" class="block text-[15px] font-medium text-ink"> CPF ou e-mail </label>
+        <button type="button" (click)="voltarParaLogin()" class="text-right text-[13px] font-medium text-brand transition-colors hover:text-brand-dark hover:underline hover:underline-offset-4">
+          Voltar para login
+        </button>
+      </div>
+      <input
+        type="text"
+        id="login"
+        name="login"
+        [(ngModel)]="emailOrCpf"
+        autocomplete="username"
+        placeholder="Digite seu CPF ou e-mail"
+        class="block min-h-[50px] w-full rounded-md border border-line bg-paper-soft px-4 py-3.5 text-[16px] text-ink outline-none transition duration-200 placeholder:text-[15px] placeholder:text-ink-soft/55 hover:border-ink-soft/40 focus:border-brand focus:bg-white focus:ring-4 focus:ring-brand/10"
+        required
+      />
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="isLoading()"
+      class="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-md bg-brand px-5 py-3.5 text-[16px] font-semibold tracking-[0.01em] text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-brand-dark hover:shadow-md active:translate-y-0 focus:outline-none focus:ring-4 focus:ring-brand/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-80 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
+    >
+      @if (isLoading()) {
+        <!-- Spinner SVG da Apple/Tailwind -->
+        <svg class="h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>A enviar...</span>
+      } @else {
+        <span>Receber código</span>
+      }
+    </button>
+  </form>
+
+} @else {
+
+  <!-- ============================================== -->
+    <!-- ESTADO 2: SUCESSO (Mensagem de segurança)      -->
+    <!-- ============================================== -->
+  <div class="flex flex-col items-center text-center py-6 animate-fade-in-up">
+
+    <!-- Ícone de E-mail Elegante -->
+    <div class="h-16 w-16 bg-brand-light text-brand rounded-full flex items-center justify-center mb-6 shadow-sm">
+      <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+      </svg>
+    </div>
+
+    <h2 class="text-[24px] font-brand tracking-wide text-ink mb-3">
+      Verifique o seu e-mail
+    </h2>
+
+    <p class="text-[15px] leading-relaxed text-ink-soft max-w-[320px] mb-8">
+      {{ message() }}
+    </p>
+
+    <button
+      (click)="voltarParaLogin()"
+      class="w-full flex items-center justify-center gap-2 rounded-md border border-line bg-white px-5 py-3.5 text-[14px] font-medium text-ink transition-colors hover:bg-paper-soft hover:border-ink-soft/30"
+    >
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      Voltar para o Login
+    </button>
+  </div>
+}

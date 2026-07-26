@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RevendedoraHero } from './components/revendedora-hero/revendedora-hero';
 import { RevendedoraVantagens } from './components/revendedora-vantagens/revendedora-vantagens';
 import { RevendedoraFormulario } from './components/revendedora-formulario/revendedora-formulario';
@@ -9,4 +9,8 @@ import { RevendedoraFormulario } from './components/revendedora-formulario/reven
   templateUrl: './revendedora.html',
   styleUrl: './revendedora.css',
 })
-export class Revendedora {}
+export class Revendedora implements OnInit {
+  ngOnInit(): void {
+
+  }
+}

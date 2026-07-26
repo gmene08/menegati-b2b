@@ -1,0 +1,76 @@
+
+<!-- Cabeçalho -->
+<div class="mb-8">
+  <h1 class="font-brand text-[28px] leading-tight tracking-wide text-ink sm:text-[32px]">
+    Acesse sua conta
+  </h1>
+  <p class="mt-2 text-[15px] leading-relaxed text-ink-soft">
+    Entre com seus dados para acessar o painel.
+  </p>
+</div>
+
+<app-error-message [message]="errorMessage()" />
+
+<form (ngSubmit)="login()" class="space-y-7">
+  <!-- Campo CPF ou E-mail -->
+  <div>
+    <label for="login" class="mb-2 block text-[15px] font-medium text-ink"> CPF ou e-mail </label>
+    <input
+      type="text"
+      id="login"
+      name="login"
+      [(ngModel)]="emailOrCpf"
+      autocomplete="username"
+      placeholder="Digite seu CPF ou e-mail"
+      class="block min-h-[50px] w-full rounded-md border border-line bg-paper-soft px-4 py-3.5 text-[16px] text-ink outline-none transition duration-200 placeholder:text-[15px] placeholder:text-ink-soft/55 hover:border-ink-soft/40 focus:border-brand focus:bg-white focus:ring-4 focus:ring-brand/10"
+      required
+    />
+  </div>
+
+  <!-- Campo Palavra-passe -->
+  <div>
+    <div class="mb-2 flex items-center justify-between gap-4">
+      <label for="password" class="block text-[15px] font-medium text-ink"> Palavra-passe </label>
+      <button
+        type="button"
+        (click)="esqueceuSenha()"
+        class="text-right text-[13px] font-medium text-brand transition-colors hover:text-brand-dark hover:underline hover:underline-offset-4"
+      >
+        Esqueceu-se da palavra-passe?
+      </button>
+    </div>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      [(ngModel)]="password"
+      autocomplete="current-password"
+      placeholder="Digite sua palavra-passe"
+      class="block min-h-[50px] w-full rounded-md border border-line bg-paper-soft px-4 py-3.5 text-[16px] text-ink outline-none transition duration-200 placeholder:text-[15px] placeholder:text-ink-soft/55 hover:border-ink-soft/40 focus:border-brand focus:bg-white focus:ring-4 focus:ring-brand/10"
+      required
+    />
+  </div>
+
+  <!-- Checkbox Lembrar-me -->
+  <div class="flex items-center gap-2.5">
+    <input
+      id="remember"
+      name="remember"
+      [(ngModel)]="rememberMe"
+      type="checkbox"
+      class="h-[18px] w-[18px] cursor-pointer rounded border-line accent-brand focus:ring-2 focus:ring-brand/30 focus:ring-offset-1"
+    />
+    <label for="remember" class="cursor-pointer text-[14px] leading-none text-ink">
+      Lembrar-me neste dispositivo
+    </label>
+  </div>
+
+  <!-- Botão Entrar -->
+  <button
+    type="submit"
+    class="flex min-h-[52px] w-full items-center justify-center rounded-md bg-brand px-5 py-3.5 text-[16px] font-semibold tracking-[0.01em] text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-brand-dark hover:shadow-md active:translate-y-0 focus:outline-none focus:ring-4 focus:ring-brand/20 focus:ring-offset-2"
+  >
+    Entrar no painel
+  </button>
+</form>
+

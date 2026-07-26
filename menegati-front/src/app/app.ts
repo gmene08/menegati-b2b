@@ -26,7 +26,11 @@ export class App implements OnInit {
 
         // Se a URL incluir '/dashboard' (ou o nome que deu à sua rota), escondemos o Header e o Footer!
         // Se a sua rota se chamar '/painel', basta trocar a palavra abaixo.
-        if (urlAtual.includes('/painel-revendedora')) {
+        if (
+          urlAtual.includes('/painel-revendedora') ||
+          urlAtual.includes('/login') ||
+          urlAtual.includes('/redefinir-senha')
+        ) {
           this.mostrarHeaderPadrao = false;
         } else {
           this.mostrarHeaderPadrao = true;

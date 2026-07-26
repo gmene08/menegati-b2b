@@ -1,0 +1,20 @@
+<div class="flex min-h-screen w-full bg-paper">
+  <!-- Lado Esquerdo: Imagem da Marca (Separado no Componente login-image) -->
+  <div class="hidden relative w-1/2 overflow-hidden bg-ink lg:block">
+    <app-login-img></app-login-img>
+  </div>
+
+  <!-- Lado Direito: Formulário de Redefinição (Separado no Componente nova-senha-form) -->
+  <div class="relative flex w-full flex-col justify-center px-6 py-12 lg:w-1/2 lg:px-20 xl:px-32">
+    <app-voltar-button></app-voltar-button>
+    <div
+      class="mx-auto w-full max-w-[440px] rounded-xl border border-line/70 bg-white/95 px-6 py-8 font-body shadow-[0_24px_70px_-42px_rgba(31,23,38,0.45)] sm:px-9 sm:py-10"
+    >
+      <app-nova-senha-form
+        [errorMessage]="redefinirSenhaErrorMsg()"
+        [sucesso]="senhaAlteradaComSucesso()"
+        (onRedefinirSenha)="redefinirSenha($event)"
+      ></app-nova-senha-form>
+    </div>
+  </div>
+</div>

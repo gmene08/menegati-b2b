@@ -5,7 +5,9 @@
       "Bash(find \"E:\\\\projetos\\\\MenegatiJoias\\\\brb-revendedoras\" -type f -name \"*.java\" -exec grep -l \"def authenticate\\\\|authenticate\\(\" {} \\\\;)",
       "Bash(find \"E:\\\\projetos\\\\MenegatiJoias\\\\brb-revendedoras\" -type f -name \"*.java\" -exec grep -l \"implements\\\\|extends\" {} \\\\;)",
       "Bash(find \"E:\\\\projetos\\\\MenegatiJoias\\\\brb-revendedoras\" -type f \\\\\\( -name \"*.yml\" -o -name \"*.yaml\" -o -name \"*.properties\" \\\\\\) -exec ls -la {} \\\\;)",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(./mvnw.cmd -q test -Dtest=AuthServiceTest,PasswordResetServiceTest)",
+      "Bash(./mvnw.cmd -q test)"
     ]
   }
 }

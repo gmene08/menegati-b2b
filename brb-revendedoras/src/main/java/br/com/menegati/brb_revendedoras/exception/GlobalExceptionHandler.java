@@ -11,11 +11,16 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleException(RuntimeException ex) {
-
-        String errorMessage = ex.getMessage();
-        return ResponseEntity.badRequest().body(Map.of("message", errorMessage));
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleUnexpectedException(
+            Exception ex
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of(
+                        "message",
+                        "Ocorreu um erro interno inesperado."
+                ));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -48,5 +53,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Map<String,String>> handleBusinessException(BusinessException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<Map<String, String>> handleEmailSendingException(
+            EmailSendingException ex
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of(
+                        "message",
+                        "Não foi possível enviar o e-mail no momento. Tente novamente mais tarde."
+                ));
     }
 }

@@ -31,7 +31,10 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password").permitAll()
                         .requestMatchers("/api/revendedores/**").hasRole(Role.REVENDEDOR.name())
                         .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated()

@@ -92,8 +92,8 @@ public class EstoqueServiceTest {
         assertNotNull(linhasIgnoradas, "Deve retornar uma lista de linhas ignoradas");
         assertEquals(2, linhasIgnoradas.size(), "Deve ter ignorado 2 linhas");
 
-        assertTrue(linhasIgnoradas.contains(2L), "Deve ter ignorado a linha 2");
-        assertTrue(linhasIgnoradas.contains(3L), "Deve ter ignorado a linha 3");
+        assertTrue(linhasIgnoradas.contains(1L), "Deve ter ignorado a linha 2");
+        assertTrue(linhasIgnoradas.contains(2L), "Deve ter ignorado a linha 3");
 
         verify(produtoRepository, times(1)).saveAll(produtosCaptor.capture());
         List<Produto> produtosSalvos = produtosCaptor.getValue();

@@ -2,11 +2,16 @@ package br.com.menegati.brb_revendedoras.services;
 
 import br.com.menegati.brb_revendedoras.dto.auth.RegisterRequestDTO;
 import br.com.menegati.brb_revendedoras.entity.Cliente;
+import br.com.menegati.brb_revendedoras.entity.PasswordResetToken;
 import br.com.menegati.brb_revendedoras.entity.Revendedor;
 import br.com.menegati.brb_revendedoras.entity.User;
 import br.com.menegati.brb_revendedoras.enums.Role;
+import br.com.menegati.brb_revendedoras.exception.BusinessException;
 import br.com.menegati.brb_revendedoras.exception.ConflictException;
+import br.com.menegati.brb_revendedoras.exception.ForbiddenException;
+import br.com.menegati.brb_revendedoras.repository.PasswordResetTokenRepository;
 import br.com.menegati.brb_revendedoras.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +20,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,18 +40,41 @@ public class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private PasswordResetService passwordResetService;
+
+    @Mock
+    private EmailService emailService;
+
+    @Mock
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
     @InjectMocks
     private AuthService authService;
 
     @Captor
     private ArgumentCaptor<User> userCaptor;
 
+    @Captor
+    private ArgumentCaptor<String> stringCaptor;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(authService, "frontendUrl", "http://localhost:4200");
+    }
+
     @Test
     @DisplayName("Deve registrar um CLIENTE com sucesso e encriptar a senha")
     void deveRegistrarUmClienteComSucesso() {
 
         RegisterRequestDTO dto = new RegisterRequestDTO(
-                "12345678900", "senha123", "João Cliente",
+                "12345678900", "Senha123!", "João Cliente",
                 "joao@email.com", "99999999", LocalDate.now()
         );
 
@@ -70,7 +100,7 @@ public class AuthServiceTest {
     void deveRegistrarUmRevendedorComSucesso() {
 
         RegisterRequestDTO dto = new RegisterRequestDTO(
-                "11122233344", "senha123", "Eucineia Revendedora",
+                "11122233344", "Senha123!", "Eucineia Revendedora",
                 "euci@email.com", "88888888", LocalDate.now()
         );
 
@@ -105,5 +135,121 @@ public class AuthServiceTest {
         assertEquals("CPF já registrado", exception.getMessage());
 
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve gerar token e enviar email quando o usuario existir ao solicitar recuperacao de senha")
+    void deveEnviarEmailAoSolicitarRecuperacaoDeSenhaComUsuarioExistente() {
+
+        String emailOuCpf = "12345678900";
+
+        Cliente user = new Cliente();
+        user.setId(1L);
+        user.setEmail("joao@email.com");
+
+        when(userRepository.findByCpfOrEmail(emailOuCpf, emailOuCpf)).thenReturn(Optional.of(user));
+        when(passwordResetService.createPasswordResetToken(user)).thenReturn("token-abc-123");
+
+        authService.forgotPassword(emailOuCpf);
+
+        verify(emailService, times(1)).sendPasswordResetEmail(eq(user.getEmail()), stringCaptor.capture());
+
+        String resetUrl = stringCaptor.getValue();
+        assertTrue(resetUrl.contains("/redefinir-senha"), "URL deve apontar para a pagina de redefinicao de senha");
+        assertTrue(resetUrl.contains("token=token-abc-123"), "URL deve conter o token gerado como query param");
+    }
+
+    @Test
+    @DisplayName("Nao deve gerar token nem enviar email quando o usuario nao existir ao solicitar recuperacao de senha")
+    void naoDeveEnviarEmailAoSolicitarRecuperacaoDeSenhaComUsuarioInexistente() {
+
+        String emailOuCpf = "naoexiste@email.com";
+
+        when(userRepository.findByCpfOrEmail(emailOuCpf, emailOuCpf)).thenReturn(Optional.empty());
+
+        assertDoesNotThrow(() -> authService.forgotPassword(emailOuCpf));
+
+        verify(passwordResetService, never()).createPasswordResetToken(any());
+        verify(emailService, never()).sendPasswordResetEmail(any(), any());
+    }
+
+    @Test
+    @DisplayName("Deve lancar excecao ao redefinir senha com token inexistente")
+    void deveLancarExcecaoAoRedefinirSenhaComTokenInexistente() {
+
+        String token = "token-invalido";
+
+        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.empty());
+
+        ForbiddenException exception = assertThrows(ForbiddenException.class,
+                () -> authService.changePassword(token, "NovaSenha123!"));
+        assertEquals("Código expirado ou invalido", exception.getMessage());
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lancar excecao ao redefinir senha com token expirado ou ja utilizado")
+    void deveLancarExcecaoAoRedefinirSenhaComTokenExpiradoOuUtilizado() {
+
+        String token = "token-expirado";
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setUser(new Cliente());
+
+        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+        when(passwordResetService.isTokenValid(resetToken)).thenReturn(false);
+
+        ForbiddenException exception = assertThrows(ForbiddenException.class,
+                () -> authService.changePassword(token, "NovaSenha123!"));
+        assertEquals("Código expirado ou invalido", exception.getMessage());
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lancar excecao ao redefinir senha com uma senha fora do padrao exigido")
+    void deveLancarExcecaoAoRedefinirSenhaComSenhaFracaDemais() {
+
+        String token = "token-valido";
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setUser(new Cliente());
+
+        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+        when(passwordResetService.isTokenValid(resetToken)).thenReturn(true);
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> authService.changePassword(token, "fraca"));
+        assertEquals("Senha deve conter de 8 a 30 caracteres, número, letra maiúscula e carácter especial", exception.getMessage());
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve redefinir a senha com sucesso quando o token for valido e a senha atender aos requisitos")
+    void deveRedefinirSenhaComSucesso() {
+
+        String token = "token-valido";
+        String novaSenha = "NovaSenha123!";
+
+        Cliente user = new Cliente();
+        user.setId(1L);
+        user.setPassword("senhaAntigaEncriptada");
+
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setUser(user);
+
+        when(passwordResetTokenRepository.findByToken(token)).thenReturn(Optional.of(resetToken));
+        when(passwordResetService.isTokenValid(resetToken)).thenReturn(true);
+        when(passwordEncoder.encode(novaSenha)).thenReturn("novaSenhaEncriptada");
+
+        authService.changePassword(token, novaSenha);
+
+        verify(userRepository, times(1)).save(userCaptor.capture());
+
+        User savedUser = userCaptor.getValue();
+        assertEquals("novaSenhaEncriptada", savedUser.getPassword(), "Senha do usuario deve ser atualizada com a senha encriptada");
     }
 }

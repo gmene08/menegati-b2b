@@ -1,0 +1,83 @@
+@if (!sucesso()) {
+  <!-- Cabeçalho -->
+  <div class="mb-8">
+    <h1 class="font-brand text-[28px] leading-tight tracking-wide text-ink sm:text-[32px]">
+      Redefinir senha
+    </h1>
+    <p class="mt-2 text-[15px] leading-relaxed text-ink-soft">Escolha uma nova senha de acesso.</p>
+  </div>
+
+  <app-error-message [message]="errorMessage()" />
+
+  <form (ngSubmit)="redefinirSenha()" class="space-y-7">
+    <!-- Campo Nova Senha -->
+    <div>
+      <label for="novaSenha" class="mb-2 block text-[15px] font-medium text-ink"> Nova senha </label>
+      <input
+        type="password"
+        id="novaSenha"
+        name="novaSenha"
+        [(ngModel)]="novaSenha"
+        autocomplete="new-password"
+        placeholder="Digite sua nova senha"
+        class="block min-h-[50px] w-full rounded-md border border-line bg-paper-soft px-4 py-3.5 text-[16px] text-ink outline-none transition duration-200 placeholder:text-[15px] placeholder:text-ink-soft/55 hover:border-ink-soft/40 focus:border-brand focus:bg-white focus:ring-4 focus:ring-brand/10"
+        required
+        minlength="8"
+      />
+    </div>
+
+    <!-- Campo Confirmar Nova Senha -->
+    <div>
+      <label for="confirmarNovaSenha" class="mb-2 block text-[15px] font-medium text-ink">
+        Confirmar nova senha
+      </label>
+      <input
+        type="password"
+        id="confirmarNovaSenha"
+        name="confirmarNovaSenha"
+        [(ngModel)]="confirmarNovaSenha"
+        autocomplete="new-password"
+        placeholder="Confirme sua nova senha"
+        class="block min-h-[50px] w-full rounded-md border border-line bg-paper-soft px-4 py-3.5 text-[16px] text-ink outline-none transition duration-200 placeholder:text-[15px] placeholder:text-ink-soft/55 hover:border-ink-soft/40 focus:border-brand focus:bg-white focus:ring-4 focus:ring-brand/10"
+        required
+      />
+    </div>
+
+    <!-- Botão Alterar Senha -->
+    <button
+      type="submit"
+      class="flex min-h-[52px] w-full items-center justify-center rounded-md bg-brand px-5 py-3.5 text-[16px] font-semibold tracking-[0.01em] text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-brand-dark hover:shadow-md active:translate-y-0 focus:outline-none focus:ring-4 focus:ring-brand/20 focus:ring-offset-2"
+    >
+      Alterar senha
+    </button>
+  </form>
+} @else {
+  <!-- ============================================== -->
+  <!-- Senha alterada com sucesso -->
+  <!-- ============================================== -->
+  <div class="flex flex-col items-center py-6 text-center animate-fade-in-up">
+    <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-brand-light text-brand shadow-sm">
+      <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M5 13l4 4L19 7"
+        ></path>
+      </svg>
+    </div>
+
+    <h2 class="mb-3 font-brand text-[24px] tracking-wide text-ink">Senha alterada com sucesso</h2>
+
+    <p class="mb-8 max-w-[320px] text-[15px] leading-relaxed text-ink-soft">
+      A sua senha foi redefinida. Faça login novamente para confirmar o acesso com a nova senha.
+    </p>
+
+    <a
+      routerLink="/login"
+      class="flex w-full items-center justify-center rounded-md bg-brand px-5 py-3.5 text-[16px] font-semibold tracking-[0.01em] text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-brand-dark hover:shadow-md active:translate-y-0 focus:outline-none focus:ring-4 focus:ring-brand/20 focus:ring-offset-2"
+    >
+      Ir para o login
+    </a>
+  </div>
+}
