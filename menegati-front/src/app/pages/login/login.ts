@@ -1,8 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { LoginImg } from './components/login-img/login-img';
 import { LoginForm } from './components/login-form/login-form';
-import { Auth, LoginData } from '../../core/services/auth';
+import { AuthService, LoginData } from '../../core/services/auth.service';
 import { RecuperarSenhaForm } from './components/recuperar-senha-form/recuperar-senha-form';
 import { HttpErrorResponse } from '@angular/common/http';
 import { VoltarButton } from './components/voltar-button/voltar-button';
@@ -16,9 +16,12 @@ import { Role } from '../../core/models/role';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
-  private authService = inject(Auth);
+export class Login implements OnInit {
+  private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  returnUrl: string = '/';
 
   loginErrorMsg = signal<string>('');
 
@@ -26,6 +29,10 @@ export class Login {
   recuperarSenhaMsg = signal<string>('');
   isLoadingRecuperar = signal<boolean>(false);
   esqueceuSenha = signal<boolean>(false);
+
+  ngOnInit(): void {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+  }
 
   login(loginData: LoginData): void {
     this.authService
@@ -35,14 +42,15 @@ export class Login {
         rememberMe: loginData.rememberMe,
       })
       .subscribe({
-        next: (res) => {
+        next: (user) => {
           console.log('Login bem sucedido!');
           this.loginErrorMsg.set('');
 
-          if(res.role === Role.REVENDEDOR ){
-            this.router.navigate(['/painel-revendedora']);
-          } else{
-            this.router.navigate(['/']);
+          if (this.returnUrl && this.returnUrl !== '/') {
+            this.router.navigate([this.returnUrl]);
+          } else {
+            const destination = user.role === Role.REVENDEDOR ? '/painel-revendedora' : '/';
+            this.router.navigate([destination]);
           }
         },
         error: (error: HttpErrorResponse) => {
@@ -59,19 +67,19 @@ export class Login {
 
     this.isLoadingRecuperar.set(true);
 
-    this.authService.forgotPassword(emailOrCpf).pipe(
-      finalize(()=>this.isLoadingRecuperar.set(false))
-    ).
-    subscribe({
-      next: (res) => {
-        this.recuperarSenhaMsg.set(res.message);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.recuperarSenhaErrorMsg.set(
-          'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.',
-        );
-      },
-    });
+    this.authService
+      .forgotPassword(emailOrCpf)
+      .pipe(finalize(() => this.isLoadingRecuperar.set(false)))
+      .subscribe({
+        next: (res) => {
+          this.recuperarSenhaMsg.set(res.message);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.recuperarSenhaErrorMsg.set(
+            'Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.',
+          );
+        },
+      });
   }
 
   esqueceuSenhaToggle() {

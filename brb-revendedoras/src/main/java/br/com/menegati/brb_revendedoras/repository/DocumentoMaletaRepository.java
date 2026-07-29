@@ -4,7 +4,11 @@ import br.com.menegati.brb_revendedoras.entity.DocumentoMaleta;
 import br.com.menegati.brb_revendedoras.enums.TipoDocumento;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface DocumentoMaletaRepository extends JpaRepository<DocumentoMaleta, Long> {
 
     boolean existsByNumeroConsignacao(String numeroConsignacao);
+
+    List<DocumentoMaleta> findByRevendedorIdOrderByLoteIdDesc(Long revendedorId);
 }

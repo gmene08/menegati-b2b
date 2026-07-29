@@ -20,12 +20,12 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -251,5 +251,19 @@ public class AuthServiceTest {
 
         User savedUser = userCaptor.getValue();
         assertEquals("novaSenhaEncriptada", savedUser.getPassword(), "Senha do usuario deve ser atualizada com a senha encriptada");
+    }
+
+    @Test
+    void deveExpirarCookieQuandoTokenForVazio() {
+        ResponseCookie cookie = authService.buildCookie("");
+        assertEquals(0, cookie.getMaxAge().getSeconds());
+    }
+
+    @Test
+    void deveUsarDuracaoLongaQuandoRememberMeForTrue() {
+        String token = "token-teste";
+        when(jwtService.getRememberMe(token)).thenReturn(true);
+        ResponseCookie cookie = authService.buildCookie(token);
+        assertEquals(30 * 24 * 60 * 60, cookie.getMaxAge().getSeconds());
     }
 }

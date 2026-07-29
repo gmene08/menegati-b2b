@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
+
 @Data
 @Entity
 @Table(name = "documento_maleta")
@@ -14,6 +16,12 @@ public class DocumentoMaleta extends DocumentoBase{
 
     @Column(name = "numero_consignacao", nullable = false, length = 50)
     private String numeroConsignacao;
+
+    @Column(name = "quantidade_pecas", nullable = false)
+    private Integer quantidadePecas;
+
+    @Column(name = "valor_total", nullable = false, precision = 10, scale = 2)
+    private BigDecimal valorTotal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "revendedor_id", nullable = false)

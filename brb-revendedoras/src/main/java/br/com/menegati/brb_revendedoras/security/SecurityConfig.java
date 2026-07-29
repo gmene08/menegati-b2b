@@ -1,6 +1,7 @@
 package br.com.menegati.brb_revendedoras.security;
 
 import br.com.menegati.brb_revendedoras.enums.Role;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,12 +35,26 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login",
                                 "/api/auth/register",
                                 "/api/auth/forgot-password",
-                                "/api/auth/reset-password").permitAll()
-                        .requestMatchers("/api/revendedores/**").hasRole(Role.REVENDEDOR.name())
+                                "/api/auth/reset-password",
+                                "/api/auth/logout").permitAll()
+                        .requestMatchers("/api/revendedora/**").hasRole(Role.REVENDEDOR.name())
                         .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"status\": 401, \"error\": \"Unauthorized\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"status\": 403, \"error\": \"Forbidden\"}");
+                        })
+                )
+        ;
         return http.build();
     }
 

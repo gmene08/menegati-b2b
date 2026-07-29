@@ -9,8 +9,5 @@ import { RevendedoraFormulario } from './components/revendedora-formulario/reven
   templateUrl: './revendedora.html',
   styleUrl: './revendedora.css',
 })
-export class Revendedora implements OnInit {
-  ngOnInit(): void {
-
-  }
+export class Revendedora{
 }

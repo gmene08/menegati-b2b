@@ -144,7 +144,7 @@ public class LoteService {
             LoteConsignacao salvoLote = loteRepository.save(lote);
             log.info("Lote consignado com sucesso! Itens criados: {} | Itens com alerta: {}", itensCriados, itensAlertas);
 
-            salvarHistoricoDoDocumento(fileName, consignacao, TipoDocumento.MALETA_ENTRADA, revendedor, lote);
+            salvarHistoricoDoDocumento(fileName, consignacao, TipoDocumento.MALETA_ENTRADA, revendedor, lote, valorTotalEstimadoDestePDF, itensCriados);
 
             return new ProcessamentoLoteResult(salvoLote, produtosAlertas, valorTotalEstimadoDestePDF, itensCriados);
 
@@ -239,7 +239,7 @@ public class LoteService {
         BigDecimal valorEstimadoAtual = lote.getValorTotalEstimado() != null ? lote.getValorTotalEstimado() : BigDecimal.ZERO;
         lote.setValorTotalEstimado(valorEstimadoAtual.subtract(valorTotalAcertadoDestePdf));
 
-        salvarHistoricoDoDocumento(f, consignacao, TipoDocumento.MALETA_ACERTO,revendedor, lote);
+        salvarHistoricoDoDocumento(f, consignacao, TipoDocumento.MALETA_ACERTO,revendedor, lote, valorTotalAcertadoDestePdf, itensAcertados);
 
         loteRepository.save(lote);
 
@@ -300,7 +300,8 @@ public class LoteService {
     }
 
     @Transactional
-    public void salvarHistoricoDoDocumento(String fileName, String consignacao, TipoDocumento tipoDocumento, Revendedor revendedor, LoteConsignacao lote){
+    public void salvarHistoricoDoDocumento(String fileName, String consignacao, TipoDocumento tipoDocumento, Revendedor revendedor, LoteConsignacao lote,
+                                           BigDecimal valorTotal, Integer quantidadePecas){
         DocumentoMaleta documentoMaleta = DocumentoMaleta.builder()
                 .nomeArquivo(fileName)
                 .numeroConsignacao(consignacao)
@@ -308,6 +309,8 @@ public class LoteService {
                 .dataProcessamento(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()))
                 .revendedor(revendedor)
                 .lote(lote)
+                .valorTotal(valorTotal)
+                .quantidadePecas(quantidadePecas)
                 .build();
 
         documentoMaletaRepository.save(documentoMaleta);

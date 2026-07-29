@@ -8,11 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Map;
 
 @RestController
@@ -24,13 +22,21 @@ public class AuthController {
 
     public record LoginResponseDTO(String name, String role) {}
 
+
+
     public record ForgotPasswordResponseDTO(String message) {}
     public record ResetPasswordResponseDTO(String message) {}
     public record ResetPasswordRequestDTO(String token, String newPassword) {}
 
+    @GetMapping("/me")
+    public ResponseEntity<LoginResponseDTO> me(Principal principal){
+        LoginResponseDTO responseDTO = this.authService.validateSession(principal.getName());
+        return ResponseEntity.ok(responseDTO);
+    }
+
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegisterRequestDTO registerData){
-        this.authService.register(registerData, Role.CLIENTE);
+        authService.register(registerData, Role.CLIENTE);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -51,4 +57,11 @@ public class AuthController {
         authService.changePassword(resetData.token(), resetData.newPassword());
         return ResponseEntity.ok(new ResetPasswordResponseDTO("Senha alterada com sucesso."));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response){
+        authService.logout(response);
+        return ResponseEntity.ok().build();
+    }
+
 }

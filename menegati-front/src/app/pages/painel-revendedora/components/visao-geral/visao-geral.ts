@@ -1,6 +1,10 @@
 import { Component, computed, input } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
-import type { ItemMaleta, LoteResumo, RevendedoraPerfil } from '../../painel-data';
+import type {
+  ItemConsignado,
+  LoteAtual,
+  RevendedoraPerfil,
+} from '../../../../core/models/painel-revendedora-data';
 
 @Component({
   selector: 'app-visao-geral',
@@ -10,8 +14,8 @@ import type { ItemMaleta, LoteResumo, RevendedoraPerfil } from '../../painel-dat
 })
 export class VisaoGeral {
   readonly revendedora = input.required<RevendedoraPerfil>();
-  readonly lote = input.required<LoteResumo>();
-  readonly itens = input.required<ItemMaleta[]>();
+  readonly lote = input.required<LoteAtual>();
+  readonly itens = input.required<ItemConsignado[]>();
 
   private readonly itensNaMaleta = computed(() =>
     this.itens().filter((item) => item.status === 'ENCARREGADO' || item.status === 'MARC_VENDIDO_REV'),

@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoginData } from '../../../../core/services/auth';
+import { LoginData } from '../../../../core/services/auth.service';
 import { ErrorMessage } from '../../../../shared/components/error-message/error-message';
 
 @Component({

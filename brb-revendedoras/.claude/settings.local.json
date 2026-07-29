@@ -7,7 +7,8 @@
       "Bash(find \"E:\\\\projetos\\\\MenegatiJoias\\\\brb-revendedoras\" -type f \\\\\\( -name \"*.yml\" -o -name \"*.yaml\" -o -name \"*.properties\" \\\\\\) -exec ls -la {} \\\\;)",
       "Bash(xargs grep *)",
       "Bash(./mvnw.cmd -q test -Dtest=AuthServiceTest,PasswordResetServiceTest)",
-      "Bash(./mvnw.cmd -q test)"
+      "Bash(./mvnw.cmd -q test)",
+      "Bash(mvn -q -DskipTests compile)"
     ]
   }
 }

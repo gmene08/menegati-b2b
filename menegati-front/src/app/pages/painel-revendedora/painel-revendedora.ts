@@ -1,11 +1,12 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { PainelHeader } from './components/painel-header/painel-header';
 import { VisaoGeral } from './components/visao-geral/visao-geral';
 import { MinhaMaleta } from './components/minha-maleta/minha-maleta';
 import { HistoricoAcertos } from './components/historico-acertos/historico-acertos';
 import { MaterialApoio } from './components/material-apoio/material-apoio';
 import type { PainelTabId } from './painel-tabs';
-import { HISTORICO_ACERTOS_MOCK, ITENS_MALETA_MOCK, LOTE_MOCK, REVENDEDORA_MOCK } from './painel-data';
+import { RevendedoraService } from '../../core/services/revendedora.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-painel-revendedora',
@@ -13,25 +14,54 @@ import { HISTORICO_ACERTOS_MOCK, ITENS_MALETA_MOCK, LOTE_MOCK, REVENDEDORA_MOCK 
   templateUrl: './painel-revendedora.html',
   styleUrl: './painel-revendedora.css',
 })
-export class PainelRevendedora {
+export class PainelRevendedora implements OnInit {
+  private readonly revendedoraService = inject(RevendedoraService);
+
+  protected readonly painelData = this.revendedoraService.revendedoraData;
+
+  protected readonly isLoading = signal<boolean>(true);
+  protected readonly errorMessage = signal<string>('');
+
   protected readonly abaAtiva = signal<PainelTabId>('visao-geral');
 
-  protected readonly revendedora = REVENDEDORA_MOCK;
-  protected readonly lote = LOTE_MOCK;
-  protected readonly historico = HISTORICO_ACERTOS_MOCK;
-  protected readonly itens = signal(ITENS_MALETA_MOCK);
+  ngOnInit(): void {
+    this.carregarDados();
+  }
+
+  carregarDados(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.revendedoraService
+      .getRevendedoraData()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        error: (error) => {
+          console.error('Erro ao carregar os dados da revendedora:', error);
+          this.errorMessage.set('Erro ao carregar os dados da revendedora.');
+        },
+      });
+  }
 
   protected mudarAba(id: PainelTabId): void {
     this.abaAtiva.set(id);
   }
 
   protected marcarComoVendido(codigo: string): void {
-    this.itens.update((itens) =>
-      itens.map((item) =>
-        item.codigo === codigo && item.status === 'ENCARREGADO'
-          ? { ...item, status: 'MARC_VENDIDO_REV' as const }
-          : item,
-      ),
-    );
+    this.revendedoraService.revendedoraData.update((data) => {
+      if (!data) return data;
+
+      return {
+        ...data,
+        loteAtual: {
+          ...data.loteAtual,
+          itens: data.loteAtual.itens.map((item) =>
+            item.codigo === codigo && item.status === 'ENCARREGADO'
+              ? { ...item, status: 'MARC_VENDIDO_REV' as const }
+              : item,
+          ),
+        },
+      };
+    });
   }
 }

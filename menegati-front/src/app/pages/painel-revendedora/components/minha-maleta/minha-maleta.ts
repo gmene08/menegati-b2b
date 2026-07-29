@@ -1,6 +1,10 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
-import { STATUS_ITEM_LABEL, type ItemMaleta, type StatusItemLote } from '../../painel-data';
+import {
+  STATUS_ITEM_LABEL,
+  type ItemConsignado,
+  type StatusItemLote,
+} from '../../../../core/models/painel-revendedora-data';
 
 @Component({
   selector: 'app-minha-maleta',
@@ -9,7 +13,7 @@ import { STATUS_ITEM_LABEL, type ItemMaleta, type StatusItemLote } from '../../p
   styleUrl: './minha-maleta.css',
 })
 export class MinhaMaleta {
-  readonly itens = input.required<ItemMaleta[]>();
+  readonly itens = input.required<ItemConsignado[]>();
 
   readonly vendido = output<string>();
 

@@ -15,7 +15,7 @@ describe('PainelHeader', () => {
 
     fixture = TestBed.createComponent(PainelHeader);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput('revendedora', { nome: 'Teste', codigo: '000.000', metaMensal: 0, valorDevidoAtual: 0 });
+    fixture.componentRef.setInput('revendedora', { nome: 'Teste', email: 'teste@menegati.com', metaMensal: 0, valorDevidoAtual: 0 });
     fixture.componentRef.setInput('abaAtiva', 'visao-geral');
     await fixture.whenStable();
   });

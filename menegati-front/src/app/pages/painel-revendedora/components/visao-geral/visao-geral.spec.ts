@@ -13,8 +13,8 @@ describe('VisaoGeral', () => {
 
     fixture = TestBed.createComponent(VisaoGeral);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput('revendedora', { nome: 'Teste', codigo: '000.000', metaMensal: 1000, valorDevidoAtual: 0 });
-    fixture.componentRef.setInput('lote', { numeroConsignacao: '1', status: 'ABERTO', dataAbertura: '01/01/2026' });
+    fixture.componentRef.setInput('revendedora', { nome: 'Teste', email: 'teste@menegati.com', metaMensal: 1000, valorDevidoAtual: 0 });
+    fixture.componentRef.setInput('lote', { status: 'ABERTO', dataAbertura: '01/01/2026', valorTotalEstimado: 0, valorTotalAcertado: 0, itens: [] });
     fixture.componentRef.setInput('itens', []);
     await fixture.whenStable();
   });

@@ -1,11 +1,10 @@
 import { Component, input } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
-import type { AcertoHistorico, TipoDocumentoMaleta } from '../../painel-data';
-
-const TIPO_DOCUMENTO_LABEL: Record<TipoDocumentoMaleta, string> = {
-  MALETA_ENTRADA: 'Nova carga recebida',
-  MALETA_ACERTO: 'Acerto realizado',
-};
+import {
+  TIPO_DOCUMENTO_LABEL,
+  type DocumentoMaleta,
+  type TipoDocumentoMaleta,
+} from '../../../../core/models/painel-revendedora-data';
 
 @Component({
   selector: 'app-historico-acertos',
@@ -14,7 +13,7 @@ const TIPO_DOCUMENTO_LABEL: Record<TipoDocumentoMaleta, string> = {
   styleUrl: './historico-acertos.css',
 })
 export class HistoricoAcertos {
-  readonly historico = input.required<AcertoHistorico[]>();
+  readonly historico = input.required<DocumentoMaleta[]>();
 
   protected readonly tipoLabel = TIPO_DOCUMENTO_LABEL;
 

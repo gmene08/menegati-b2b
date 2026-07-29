@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PAINEL_TABS, type PainelTabId } from '../../painel-tabs';
-import type { RevendedoraPerfil } from '../../painel-data';
+import type { RevendedoraPerfil } from '../../../../core/models/painel-revendedora-data';
 
 @Component({
   selector: 'app-painel-header',

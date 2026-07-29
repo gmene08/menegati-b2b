@@ -1,24 +1,43 @@
 <div class="flex min-h-screen w-full flex-col bg-paper-soft font-body">
-  <app-painel-header
-    [revendedora]="revendedora"
-    [abaAtiva]="abaAtiva()"
-    (abaChange)="mudarAba($event)"
-  ></app-painel-header>
+  @if (isLoading()) {
+    <div class="flex flex-1 items-center justify-center p-12 text-[14px] text-ink-soft">
+      Carregando painel...
+    </div>
+  } @else if (errorMessage()) {
+    <div class="flex flex-1 items-center justify-center p-12 text-[14px] text-red-600">
+      {{ errorMessage() }}
+    </div>
+  } @else {
+    @if (painelData(); as data) {
+      <app-painel-header
+        [revendedora]="data.perfil"
+        [abaAtiva]="abaAtiva()"
+        (abaChange)="mudarAba($event)"
+      ></app-painel-header>
 
-  <main class="content-container w-full flex-1 px-5 py-8 md:px-8 md:py-12">
-    @switch (abaAtiva()) {
-      @case ('visao-geral') {
-        <app-visao-geral [revendedora]="revendedora" [lote]="lote" [itens]="itens()"></app-visao-geral>
-      }
-      @case ('maleta') {
-        <app-minha-maleta [itens]="itens()" (vendido)="marcarComoVendido($event)"></app-minha-maleta>
-      }
-      @case ('historico') {
-        <app-historico-acertos [historico]="historico"></app-historico-acertos>
-      }
-      @case ('material') {
-        <app-material-apoio></app-material-apoio>
-      }
+      <main class="content-container w-full flex-1 px-5 py-8 md:px-8 md:py-12">
+        @switch (abaAtiva()) {
+          @case ('visao-geral') {
+            <app-visao-geral
+              [revendedora]="data.perfil"
+              [lote]="data.loteAtual"
+              [itens]="data.loteAtual.itens"
+            ></app-visao-geral>
+          }
+          @case ('maleta') {
+            <app-minha-maleta
+              [itens]="data.loteAtual.itens"
+              (vendido)="marcarComoVendido($event)"
+            ></app-minha-maleta>
+          }
+          @case ('historico') {
+            <app-historico-acertos [historico]="data.historicoDocumentos"></app-historico-acertos>
+          }
+          @case ('material') {
+            <app-material-apoio></app-material-apoio>
+          }
+        }
+      </main>
     }
-  </main>
+  }
 </div>

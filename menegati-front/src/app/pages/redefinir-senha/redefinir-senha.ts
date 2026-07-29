@@ -4,7 +4,7 @@ import { LoginImg } from '../login/components/login-img/login-img';
 import { VoltarButton } from '../login/components/voltar-button/voltar-button';
 import { NovaSenhaForm, NovaSenhaData } from './components/nova-senha-form/nova-senha-form';
 import { ActivatedRoute } from '@angular/router';
-import { Auth } from '../../core/services/auth';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-redefinir-senha',
@@ -13,7 +13,7 @@ import { Auth } from '../../core/services/auth';
   styleUrl: './redefinir-senha.css',
 })
 export class RedefinirSenha implements OnInit {
-  authService = inject(Auth);
+  authService = inject(AuthService);
   route = inject(ActivatedRoute);
 
   token: string | null = null;

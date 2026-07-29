@@ -7,7 +7,7 @@
 
 <div class="rounded-sm border border-line bg-paper shadow-sm">
   <ul class="divide-y divide-line">
-    @for (registo of historico(); track registo.id) {
+    @for (registo of historico(); track registo.numeroConsignacao + registo.tipoDocumento) {
       <li class="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-start gap-4">
           <span
@@ -33,7 +33,7 @@
         <div class="flex items-center gap-6 pl-15 text-[13px] sm:pl-0">
           <div class="text-right">
             <p class="text-ink-soft">Peças</p>
-            <p class="font-medium text-ink">{{ registo.totalPecas }}</p>
+            <p class="font-medium text-ink">{{ registo.quantidadePecas }}</p>
           </div>
           <div class="text-right">
             <p class="text-ink-soft">Valor</p>

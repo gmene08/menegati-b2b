@@ -1,6 +1,6 @@
 package br.com.menegati.brb_revendedoras.services;
 
-import br.com.menegati.brb_revendedoras.controller.AuthController;
+
 import br.com.menegati.brb_revendedoras.dto.auth.LoginRequestDTO;
 import br.com.menegati.brb_revendedoras.dto.auth.RegisterRequestDTO;
 import br.com.menegati.brb_revendedoras.entity.Cliente;
@@ -8,9 +8,8 @@ import br.com.menegati.brb_revendedoras.entity.PasswordResetToken;
 import br.com.menegati.brb_revendedoras.entity.Revendedor;
 import br.com.menegati.brb_revendedoras.entity.User;
 import br.com.menegati.brb_revendedoras.enums.Role;
-import br.com.menegati.brb_revendedoras.exception.BusinessException;
-import br.com.menegati.brb_revendedoras.exception.ConflictException;
-import br.com.menegati.brb_revendedoras.exception.ForbiddenException;
+import br.com.menegati.brb_revendedoras.enums.SessionDuration;
+import br.com.menegati.brb_revendedoras.exception.*;
 import br.com.menegati.brb_revendedoras.controller.AuthController.LoginResponseDTO;
 import br.com.menegati.brb_revendedoras.repository.PasswordResetTokenRepository;
 import br.com.menegati.brb_revendedoras.repository.UserRepository;
@@ -27,6 +26,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,11 @@ public class AuthService {
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
+    public LoginResponseDTO validateSession(String cpf){
+        User user = userRepository.findByCpf(cpf).orElseThrow(()->new ResourceNotFoundException("Usuário não encontrado"));
+        return new LoginResponseDTO(user.getName(), user.getRole().name());
+    }
+
     public LoginResponseDTO login(LoginRequestDTO userData, HttpServletResponse response) {
 
         try {
@@ -54,14 +60,17 @@ public class AuthService {
 
             var user = (User) authentication.getPrincipal();
 
-            assert user != null;
-            var token = jwtService.generateToken(user);
+            Objects.requireNonNull(user);
+
+            SessionDuration sessionDuration = SessionDuration.fromRememberMe(userData.rememberMe());
+
+            var token = jwtService.generateToken(user, sessionDuration.getJwtExpiration(), userData.rememberMe());
 
             response.addHeader(HttpHeaders.SET_COOKIE,buildCookie(token).toString());
 
             return new LoginResponseDTO(user.getName(), user.getRole().name());
         } catch (AuthenticationException e) {
-            throw new BusinessException("login ou senha inválidos. Verifique e tente novamente.");
+            throw new UnauthorizedException("Login ou senha inválidos. Verifique e tente novamente.");
         }
 
     }
@@ -131,12 +140,18 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    private ResponseCookie buildCookie(String token) {
+    public void logout(HttpServletResponse response){
+        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie("").toString());
+    }
+
+    public static ResponseCookie buildCookie(String token) {
+        int expirationTimeInSeconds = !token.isEmpty() ? SessionDuration.fromRememberMe(JwtService.getRememberMe(token)).getCookieMaxAgeSeconds() : 0;
+
         return ResponseCookie.from("token", token)
                 .path("/")
                 .httpOnly(true)
                 .sameSite("Lax")
-                .maxAge(604800)
+                .maxAge(expirationTimeInSeconds)
                 .build();
     }
 
