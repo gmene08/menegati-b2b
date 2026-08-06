@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 
 @Data
@@ -33,11 +34,11 @@ public class PasswordResetToken {
     public PasswordResetToken(String token, User user, int expiryTimeInMinutes) {
         this.token = token;
         this.user = user;
-        this.expirationDate = LocalDateTime.now().plusMinutes(expiryTimeInMinutes);
+        this.expirationDate = LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()).plusMinutes(expiryTimeInMinutes);
     }
 
     public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expirationDate);
+        return LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()).isAfter(expirationDate);
     }
 
 }

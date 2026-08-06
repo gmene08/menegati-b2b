@@ -37,4 +37,7 @@ public class Revendedor extends User {
 
     @Column(name = "valor_devido_atual", precision = 10, scale = 2)
     private BigDecimal valorDevidoAtual = BigDecimal.ZERO;
+
+    @Column(name = "percentual_comissao", precision = 5, scale = 2, nullable = false)
+    private BigDecimal percentualComissao = new BigDecimal("40.00");
 }

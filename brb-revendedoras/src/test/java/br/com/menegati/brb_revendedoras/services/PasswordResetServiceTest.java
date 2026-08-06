@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -53,7 +54,7 @@ public class PasswordResetServiceTest {
         PasswordResetToken savedToken = tokenCaptor.getValue();
         assertEquals(token, savedToken.getToken(), "Token salvo deve ser igual ao token retornado");
         assertEquals(user, savedToken.getUser(), "Usuario do token salvo deve ser o mesmo informado");
-        assertTrue(savedToken.getExpirationDate().isAfter(LocalDateTime.now()), "Data de expiracao deve ser no futuro");
+        assertTrue(savedToken.getExpirationDate().isAfter(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId())), "Data de expiracao deve ser no futuro");
     }
 
     @Test
@@ -66,7 +67,7 @@ public class PasswordResetServiceTest {
         PasswordResetToken tokenExistente = new PasswordResetToken();
         tokenExistente.setToken("token-antigo");
         tokenExistente.setUser(user);
-        tokenExistente.setExpirationDate(LocalDateTime.now().minusMinutes(5));
+        tokenExistente.setExpirationDate(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()).minusMinutes(5));
         tokenExistente.setUsed(true);
 
         when(passwordResetTokenRepository.findByUserId(user.getId())).thenReturn(Optional.of(tokenExistente));
@@ -80,7 +81,7 @@ public class PasswordResetServiceTest {
         PasswordResetToken savedToken = tokenCaptor.getValue();
         assertSame(tokenExistente, savedToken, "Deve reaproveitar a mesma entidade de token ja existente");
         assertEquals(novoToken, savedToken.getToken(), "Token salvo deve ter sido atualizado com o novo valor");
-        assertTrue(savedToken.getExpirationDate().isAfter(LocalDateTime.now()), "Data de expiracao deve ter sido renovada para o futuro");
+        assertTrue(savedToken.getExpirationDate().isAfter(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId())), "Data de expiracao deve ter sido renovada para o futuro");
     }
 
     @Test
@@ -88,7 +89,7 @@ public class PasswordResetServiceTest {
     void deveConsiderarTokenValido() {
 
         PasswordResetToken token = new PasswordResetToken();
-        token.setExpirationDate(LocalDateTime.now().plusMinutes(10));
+        token.setExpirationDate(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()).plusMinutes(10));
         token.setUsed(false);
 
         assertTrue(passwordResetService.isTokenValid(token));
@@ -99,7 +100,7 @@ public class PasswordResetServiceTest {
     void deveConsiderarTokenInvalidoQuandoExpirado() {
 
         PasswordResetToken token = new PasswordResetToken();
-        token.setExpirationDate(LocalDateTime.now().minusMinutes(1));
+        token.setExpirationDate(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()).minusMinutes(1));
         token.setUsed(false);
 
         assertFalse(passwordResetService.isTokenValid(token));
@@ -110,7 +111,7 @@ public class PasswordResetServiceTest {
     void deveConsiderarTokenInvalidoQuandoJaUtilizado() {
 
         PasswordResetToken token = new PasswordResetToken();
-        token.setExpirationDate(LocalDateTime.now().plusMinutes(10));
+        token.setExpirationDate(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()).plusMinutes(10));
         token.setUsed(true);
 
         assertFalse(passwordResetService.isTokenValid(token));

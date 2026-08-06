@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 import java.util.UUID;
 
 @Service
@@ -32,7 +33,7 @@ public class PasswordResetService {
         );
         token.setToken(newTokenString);
         token.setUser(user);
-        token.setExpirationDate(LocalDateTime.now().plusMinutes(EXPIRATION_TIME_IN_MINUTES));
+        token.setExpirationDate(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()).plusMinutes(EXPIRATION_TIME_IN_MINUTES));
 
         passwordResetTokenRepository.save(token);
 

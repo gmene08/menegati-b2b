@@ -8,7 +8,11 @@
       "Bash(xargs grep *)",
       "Bash(./mvnw.cmd -q test -Dtest=AuthServiceTest,PasswordResetServiceTest)",
       "Bash(./mvnw.cmd -q test)",
-      "Bash(mvn -q -DskipTests compile)"
+      "Bash(mvn -q -DskipTests compile)",
+      "Bash(./mvnw.cmd -q test -Dtest=AcertoServiceTest,LancamentoFinanceiroServiceTest,ContaCorrenteServiceTest)",
+      "Bash(./mvnw.cmd test *)",
+      "Bash(./mvnw -q -o test)",
+      "Bash(./mvnw -q -o test -Dtest=ContaCorrenteServiceTest,AcertoServiceTest,LancamentoFinanceiroServiceTest)"
     ]
   }
 }

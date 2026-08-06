@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 @Data
 @Entity
@@ -41,7 +42,7 @@ public class ItemConsignacao {
     private StatusItemLote statusItem = StatusItemLote.ENCARREGADO;
 
     @Column(name = "data_atualizacao")
-    private LocalDateTime dataAtualizacao = LocalDateTime.now();
+    private LocalDateTime dataAtualizacao = LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId());
 
     @Column(name = "documento_entrada", length = 50)
     private String documentoEntrada; // Guarda o número da Consignação que adicionou a peça

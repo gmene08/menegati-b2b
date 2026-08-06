@@ -8,12 +8,14 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseCookie;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Duration;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JwtServiceTest {
@@ -75,5 +77,38 @@ public class JwtServiceTest {
     @DisplayName("Deve retornar vazio ao validar token vazio")
     void deveRetornarVazioParaTokenVazio() {
         assertEquals("", jwtService.validateToken(""));
+    }
+
+    @Test
+    @DisplayName("getRememberMe deve refletir a claim rememberMe gravada no token")
+    void getRememberMeDeveRefletirClaimDoToken() {
+        String tokenComRememberMe = jwtService.generateToken(user, Duration.ofDays(30), true);
+        String tokenSemRememberMe = jwtService.generateToken(user, Duration.ofHours(8), false);
+
+        assertTrue(jwtService.getRememberMe(tokenComRememberMe));
+        assertFalse(jwtService.getRememberMe(tokenSemRememberMe));
+    }
+
+    @Test
+    @DisplayName("buildCookie deve expirar imediatamente (maxAge 0) quando o token for vazio")
+    void buildCookieDeveExpirarQuandoTokenForVazio() {
+        ResponseCookie cookie = jwtService.buildCookie("");
+        assertEquals(0, cookie.getMaxAge().getSeconds());
+    }
+
+    @Test
+    @DisplayName("buildCookie deve usar duração longa (30 dias) quando o token tiver rememberMe=true")
+    void buildCookieDeveUsarDuracaoLongaQuandoRememberMeForTrue() {
+        String token = jwtService.generateToken(user, Duration.ofDays(30), true);
+        ResponseCookie cookie = jwtService.buildCookie(token);
+        assertEquals(30 * 24 * 60 * 60, cookie.getMaxAge().getSeconds());
+    }
+
+    @Test
+    @DisplayName("buildCookie deve expirar ao fechar o navegador (maxAge -1) quando o token tiver rememberMe=false")
+    void buildCookieDeveExpirarAoFecharNavegadorQuandoRememberMeForFalse() {
+        String token = jwtService.generateToken(user, Duration.ofHours(8), false);
+        ResponseCookie cookie = jwtService.buildCookie(token);
+        assertEquals(-1, cookie.getMaxAge().getSeconds());
     }
 }

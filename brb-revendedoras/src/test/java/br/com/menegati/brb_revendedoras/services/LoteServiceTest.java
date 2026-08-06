@@ -33,6 +33,7 @@ public class LoteServiceTest {
     @Mock private ProdutoRepository produtoRepository;
     @Mock private ItemConsignacaoRepository itemConsignacaoRepository;
     @Mock private DocumentoMaletaRepository documentoMaletaRepository;
+    @Mock private AcertoService acertoService;
 
     @Spy
     @InjectMocks

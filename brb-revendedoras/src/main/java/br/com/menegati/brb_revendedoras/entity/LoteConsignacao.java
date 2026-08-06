@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 @Data
 @Entity
@@ -28,7 +29,7 @@ public class LoteConsignacao {
     private Revendedor revendedor;
 
     @Column(name = "data_abertura", nullable = false)
-    private LocalDateTime dataAbertura = LocalDateTime.now();
+    private LocalDateTime dataAbertura = LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId());
 
     @Column(name = "data_fechamento")
     private LocalDateTime dataFechamento;

@@ -10,6 +10,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -107,12 +108,25 @@ public class JwtService {
         }
     }
 
-    public static boolean getRememberMe(String token){
+    public boolean getRememberMe(String token){
         return JWT.decode(token).getClaim("rememberMe").asBoolean();
     }
 
     public Instant getExpirationDate(String token){
         return JWT.decode(token).getExpiresAt().toInstant();
+    }
+
+    public ResponseCookie buildCookie(String token) {
+        int expirationTimeInSeconds = !token.isEmpty()
+                ? SessionDuration.fromRememberMe(getRememberMe(token)).getCookieMaxAgeSeconds()
+                : 0;
+
+        return ResponseCookie.from("token", token)
+                .path("/")
+                .httpOnly(true)
+                .sameSite("Lax")
+                .maxAge(expirationTimeInSeconds)
+                .build();
     }
 
 }

@@ -144,15 +144,8 @@ public class AuthService {
         response.addHeader(HttpHeaders.SET_COOKIE, buildCookie("").toString());
     }
 
-    public static ResponseCookie buildCookie(String token) {
-        int expirationTimeInSeconds = !token.isEmpty() ? SessionDuration.fromRememberMe(JwtService.getRememberMe(token)).getCookieMaxAgeSeconds() : 0;
-
-        return ResponseCookie.from("token", token)
-                .path("/")
-                .httpOnly(true)
-                .sameSite("Lax")
-                .maxAge(expirationTimeInSeconds)
-                .build();
+    public ResponseCookie buildCookie(String token) {
+        return jwtService.buildCookie(token);
     }
 
     private void validatePassword(String password){

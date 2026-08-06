@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 @Data
 @Entity
@@ -50,5 +51,5 @@ public class Produto {
     private boolean ativo = true;
 
     @Column(name = "ultima_atualizacao")
-    private LocalDateTime ultimaAtualizacao = LocalDateTime.now();
+    private LocalDateTime ultimaAtualizacao = LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId());
 }

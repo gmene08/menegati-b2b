@@ -48,20 +48,14 @@ export class PainelRevendedora implements OnInit {
   }
 
   protected marcarComoVendido(codigo: string): void {
-    this.revendedoraService.revendedoraData.update((data) => {
-      if (!data) return data;
 
-      return {
-        ...data,
-        loteAtual: {
-          ...data.loteAtual,
-          itens: data.loteAtual.itens.map((item) =>
-            item.codigo === codigo && item.status === 'ENCARREGADO'
-              ? { ...item, status: 'MARC_VENDIDO_REV' as const }
-              : item,
-          ),
-        },
-      };
-    });
+  }
+
+  protected desmarcarVendido(codigo: string): void {
+
+  }
+
+  tentarNovamente(){
+
   }
 }

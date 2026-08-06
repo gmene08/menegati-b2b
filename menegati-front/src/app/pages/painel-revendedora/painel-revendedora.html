@@ -4,8 +4,15 @@
       Carregando painel...
     </div>
   } @else if (errorMessage()) {
-    <div class="flex flex-1 items-center justify-center p-12 text-[14px] text-red-600">
-      {{ errorMessage() }}
+    <div class="flex-1 flex flex-col items-center justify-center px-4 text-center">
+      <div class="h-16 w-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4">
+        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      </div>
+      <h3 class="text-xl font-brand text-ink mb-2">Ops, algo correu mal</h3>
+      <p class="text-ink-soft mb-6 max-w-md">{{ errorMessage() }}</p>
+      <button (click)="tentarNovamente()" class="bg-brand text-white px-6 py-2 rounded-sm hover:bg-brand-dark transition-colors">
+        Tentar Novamente
+      </button>
     </div>
   } @else {
     @if (painelData(); as data) {
@@ -22,12 +29,14 @@
               [revendedora]="data.perfil"
               [lote]="data.loteAtual"
               [itens]="data.loteAtual.itens"
+              [historico]="data.historicoDocumentos"
             ></app-visao-geral>
           }
           @case ('maleta') {
             <app-minha-maleta
               [itens]="data.loteAtual.itens"
-              (vendido)="marcarComoVendido($event)"
+              (onDesmarcarVendido)="desmarcarVendido($event)"
+              (onMarcarVendido)="marcarComoVendido($event)"
             ></app-minha-maleta>
           }
           @case ('historico') {

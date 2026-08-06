@@ -33,6 +33,8 @@ public class LoteService {
     private final ItemConsignacaoRepository itemConsignacaoRepository;
     private final DocumentoMaletaRepository documentoMaletaRepository;
 
+    private final AcertoService acertoService;
+
     public static final String REGEX_LINHAS_PRODUTOS = "^\\s*(\\d{6})\\s+([\\s\\S]+?)\\s+([0-9.,]+)\\s+([0-9.,]+)\\s+([0-9.,]+)\\s*$";
 
     public record ProcessamentoLoteResult(LoteConsignacao lote, Map<Long, String> produtosAlertas, BigDecimal valorTotalDestePdf, int numeroDePecasDestePdf) {}
@@ -239,7 +241,8 @@ public class LoteService {
         BigDecimal valorEstimadoAtual = lote.getValorTotalEstimado() != null ? lote.getValorTotalEstimado() : BigDecimal.ZERO;
         lote.setValorTotalEstimado(valorEstimadoAtual.subtract(valorTotalAcertadoDestePdf));
 
-        salvarHistoricoDoDocumento(f, consignacao, TipoDocumento.MALETA_ACERTO,revendedor, lote, valorTotalAcertadoDestePdf, itensAcertados);
+        DocumentoMaleta documentoAcerto = salvarHistoricoDoDocumento(f, consignacao, TipoDocumento.MALETA_ACERTO,revendedor, lote, valorTotalAcertadoDestePdf, itensAcertados);
+        acertoService.criarAcerto(documentoAcerto);
 
         loteRepository.save(lote);
 
@@ -300,7 +303,7 @@ public class LoteService {
     }
 
     @Transactional
-    public void salvarHistoricoDoDocumento(String fileName, String consignacao, TipoDocumento tipoDocumento, Revendedor revendedor, LoteConsignacao lote,
+    public DocumentoMaleta salvarHistoricoDoDocumento(String fileName, String consignacao, TipoDocumento tipoDocumento, Revendedor revendedor, LoteConsignacao lote,
                                            BigDecimal valorTotal, Integer quantidadePecas){
         DocumentoMaleta documentoMaleta = DocumentoMaleta.builder()
                 .nomeArquivo(fileName)
@@ -313,6 +316,6 @@ public class LoteService {
                 .quantidadePecas(quantidadePecas)
                 .build();
 
-        documentoMaletaRepository.save(documentoMaleta);
+        return documentoMaletaRepository.save(documentoMaleta);
     }
 }

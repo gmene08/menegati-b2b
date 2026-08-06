@@ -41,9 +41,20 @@ public class PainelRevendedoraResponseDTO {
                                      Integer quantidadePecas,
                                      Long loteId) {}
 
+    public record AcertoDTO(Long loteId,
+                            String documentoMaleta,
+                            String dataAcerto,
+                            String dataVencimento,
+                            BigDecimal valorVendidoBruto,
+                            BigDecimal percentualComissaoAplicado,
+                            BigDecimal valorComissao,
+                            BigDecimal valorDevido
+    ){}
+
     private RevendedorDTO perfil;
     private LoteDTO loteAtual;
     private List<DocumentoMaletaDTO> historicoDocumentos;
+    private List<AcertoDTO> historicoAcertos;
 
 
 }

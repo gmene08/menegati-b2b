@@ -1,10 +1,13 @@
 package br.com.menegati.brb_revendedoras.controller;
 
 import br.com.menegati.brb_revendedoras.dto.auth.RegisterRequestDTO;
+import br.com.menegati.brb_revendedoras.dto.revendedora.ExtratoResponseDTO;
 import br.com.menegati.brb_revendedoras.entity.LoteConsignacao;
+import br.com.menegati.brb_revendedoras.enums.FormaPagamento;
 import br.com.menegati.brb_revendedoras.enums.Role;
 import br.com.menegati.brb_revendedoras.exception.BusinessException;
 import br.com.menegati.brb_revendedoras.services.AuthService;
+import br.com.menegati.brb_revendedoras.services.ContaCorrenteService;
 import br.com.menegati.brb_revendedoras.services.EstoqueService;
 import br.com.menegati.brb_revendedoras.services.LoteService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class AdminController {
     private final AuthService authService;
     private final EstoqueService estoqueService;
     private final LoteService loteService;
+    private final ContaCorrenteService contaCorrenteService;
 
     public record ImportarEstoqueResponseDTO(String message, List<Long> linhasIgnoradas, int quantidadeLinhas) {}
 
@@ -47,6 +51,11 @@ public class AdminController {
             float valorTotalAcertadoNestePdf,
             float valorTotalAcertadoDaMaleta,
             Map<Long,String> produtosComAlerta) {}
+
+    public record PagamentoRequestDTO(float valorTotalPagamento, FormaPagamento formaPagamento, String observacao) {}
+    public record PagamentoResponseDTO(String message) {}
+
+    public record SaldoResponseDTO(float saldo) {}
 
     @PostMapping("/register/{role}")
     public ResponseEntity<Void> register(@RequestBody RegisterRequestDTO registerData, @PathVariable String role){
@@ -127,6 +136,31 @@ public class AdminController {
                 lote.getValorTotalAcertado().floatValue(),
                 result.produtosAlertas()
         ));
+    }
+
+    @PostMapping("/revendedora/{id}/pagamentos")
+    public ResponseEntity<PagamentoResponseDTO> salvarPagamento(@PathVariable Long id, @RequestBody PagamentoRequestDTO pagamentoRequest){
+        PagamentoResponseDTO responseDTO = contaCorrenteService.salvarPagamento(
+                id,
+                pagamentoRequest.valorTotalPagamento,
+                pagamentoRequest.formaPagamento,
+                pagamentoRequest.observacao
+        );
+
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @GetMapping("/revendedora/{id}/saldo")
+    public ResponseEntity<SaldoResponseDTO> getSaldo(@PathVariable Long id){
+        SaldoResponseDTO responseDTO = new SaldoResponseDTO(contaCorrenteService.getSaldoDevedor(id).floatValue());
+
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @GetMapping("/revendedora/{id}/extrato")
+    public ResponseEntity<ExtratoResponseDTO> getExtrato(@PathVariable Long id){
+        ExtratoResponseDTO responseDTO = contaCorrenteService.getExtrato(id);
+        return ResponseEntity.ok(responseDTO);
     }
 
 }

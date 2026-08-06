@@ -254,16 +254,14 @@ public class AuthServiceTest {
     }
 
     @Test
-    void deveExpirarCookieQuandoTokenForVazio() {
-        ResponseCookie cookie = authService.buildCookie("");
-        assertEquals(0, cookie.getMaxAge().getSeconds());
-    }
-
-    @Test
-    void deveUsarDuracaoLongaQuandoRememberMeForTrue() {
+    @DisplayName("Deve delegar a construção do cookie para o JwtService, que é quem sabe decodificar o token")
+    void deveDelegarConstrucaoDoCookieParaOJwtService() {
         String token = "token-teste";
-        when(jwtService.getRememberMe(token)).thenReturn(true);
+        ResponseCookie cookieEsperado = ResponseCookie.from("token", token).maxAge(30 * 24 * 60 * 60).build();
+        when(jwtService.buildCookie(token)).thenReturn(cookieEsperado);
+
         ResponseCookie cookie = authService.buildCookie(token);
-        assertEquals(30 * 24 * 60 * 60, cookie.getMaxAge().getSeconds());
+
+        assertSame(cookieEsperado, cookie, "AuthService.buildCookie deve repassar exatamente o cookie construído pelo JwtService");
     }
 }

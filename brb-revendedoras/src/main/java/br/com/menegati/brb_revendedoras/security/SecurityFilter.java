@@ -1,7 +1,6 @@
 package br.com.menegati.brb_revendedoras.security;
 
 import br.com.menegati.brb_revendedoras.repository.UserRepository;
-import br.com.menegati.brb_revendedoras.services.AuthService;
 import br.com.menegati.brb_revendedoras.services.JwtService;
 import com.auth0.jwt.JWT;
 import jakarta.servlet.FilterChain;
@@ -52,7 +51,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     private void renewToken(String token, HttpServletResponse response) {
         String renewedToken = jwtService.renewToken(token);
-        ResponseCookie newCookie = AuthService.buildCookie(renewedToken);
+        ResponseCookie newCookie = jwtService.buildCookie(renewedToken);
 
         response.addHeader(HttpHeaders.SET_COOKIE, newCookie.toString());
     }

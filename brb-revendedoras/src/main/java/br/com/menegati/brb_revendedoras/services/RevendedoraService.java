@@ -1,5 +1,6 @@
 package br.com.menegati.brb_revendedoras.services;
 
+import br.com.menegati.brb_revendedoras.controller.AdminController;
 import br.com.menegati.brb_revendedoras.dto.revendedora.PainelRevendedoraResponseDTO;
 import br.com.menegati.brb_revendedoras.entity.DocumentoMaleta;
 import br.com.menegati.brb_revendedoras.entity.LoteConsignacao;
@@ -8,10 +9,13 @@ import br.com.menegati.brb_revendedoras.entity.User;
 import br.com.menegati.brb_revendedoras.enums.StatusLote;
 import br.com.menegati.brb_revendedoras.exception.BusinessException;
 import br.com.menegati.brb_revendedoras.exception.ResourceNotFoundException;
+import br.com.menegati.brb_revendedoras.entity.Acerto;
 import br.com.menegati.brb_revendedoras.mapper.PainelRevendedoraMapper;
+import br.com.menegati.brb_revendedoras.repository.AcertoRepository;
 import br.com.menegati.brb_revendedoras.repository.DocumentoMaletaRepository;
 import br.com.menegati.brb_revendedoras.repository.LoteRepository;
 import br.com.menegati.brb_revendedoras.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +28,8 @@ public class RevendedoraService {
     private final UserRepository userRepository;
     private final LoteRepository loteRepository;
     private final DocumentoMaletaRepository documentoMaletaRepository;
+    private final AcertoRepository acertoRepository;
+    private final ContaCorrenteService contaCorrenteService;
 
 
     public PainelRevendedoraResponseDTO getRevendedoraData(String cpf) {
@@ -35,13 +41,15 @@ public class RevendedoraService {
 
         LoteConsignacao loteAtual = loteRepository.findByRevendedorIdAndStatus(revendedora.getId(), StatusLote.ABERTO).orElse(null);
         List<DocumentoMaleta> historicoDocumentos = documentoMaletaRepository.findByRevendedorIdOrderByLoteIdDesc(revendedora.getId());
+        List<Acerto> historicoAcertos = acertoRepository.findByRevendedorIdOrderByDataAcertoDesc(revendedora.getId());
 
         PainelRevendedoraResponseDTO responseDTO = new PainelRevendedoraResponseDTO();
-        responseDTO.setPerfil(mapper.toRevendedorDTO(revendedora));
+        responseDTO.setPerfil(mapper.toRevendedorDTO(revendedora, contaCorrenteService.getSaldoDevedor(revendedora.getId())));
         responseDTO.setLoteAtual(mapper.toLoteDTO(loteAtual));
         responseDTO.setHistoricoDocumentos(mapper.toDocumentoDTOList(historicoDocumentos));
+        responseDTO.setHistoricoAcertos(mapper.toAcertoDTOList(historicoAcertos));
 
         return responseDTO;
-
     }
+
 }

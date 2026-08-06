@@ -24,4 +24,6 @@ public class RevendedoraController {
         PainelRevendedoraResponseDTO responseDTO = revendedoraService.getRevendedoraData(principal.getName());
         return ResponseEntity.ok(responseDTO);
     }
+
+
 }
