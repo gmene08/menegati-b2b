@@ -47,8 +47,29 @@ export interface DocumentoMaleta {
   loteId: number;
 }
 
+export interface Acerto {
+  loteId: number;
+  documentoMaleta: string;
+  dataAcerto: string;
+  dataVencimento: string;
+  valorVendidoBruto: number;
+  percentualComissaoAplicado: number;
+  valorComissao: number;
+  valorDevido: number;
+}
+
+export interface Carga {
+  loteId: number;
+  documentoMaleta: string;
+  dataAbertura: string;
+  valorTotalEstimado: number;
+  quantidadePecas: number;
+}
+
 export interface PainelRevendedoraData {
   perfil: RevendedoraPerfil;
   loteAtual: LoteAtual;
   historicoDocumentos: DocumentoMaleta[];
+  historicoAcertos: Acerto[];
+  historicoCargas: Carga[];
 }

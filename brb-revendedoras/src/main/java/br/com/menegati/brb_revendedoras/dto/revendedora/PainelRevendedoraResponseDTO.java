@@ -51,10 +51,18 @@ public class PainelRevendedoraResponseDTO {
                             BigDecimal valorDevido
     ){}
 
+    public record CargaDTO(Long loteId,
+                           String documentoMaleta,
+                           String dataAbertura,
+                           BigDecimal valorTotalEstimado,
+                           Integer quantidadePecas
+    ){}
+
     private RevendedorDTO perfil;
     private LoteDTO loteAtual;
     private List<DocumentoMaletaDTO> historicoDocumentos;
     private List<AcertoDTO> historicoAcertos;
+    private List<CargaDTO> historicoCargas;
 
 
 }

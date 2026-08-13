@@ -30,10 +30,11 @@ public class LoteService {
     private final UserRepository userRepository;
     private final LoteRepository loteRepository;
     private final ProdutoRepository produtoRepository;
-    private final ItemConsignacaoRepository itemConsignacaoRepository;
+    private final ItemLoteRepository itemLoteRepository;
     private final DocumentoMaletaRepository documentoMaletaRepository;
 
     private final AcertoService acertoService;
+    private final CargaService cargaService;
 
     public static final String REGEX_LINHAS_PRODUTOS = "^\\s*(\\d{6})\\s+([\\s\\S]+?)\\s+([0-9.,]+)\\s+([0-9.,]+)\\s+([0-9.,]+)\\s*$";
 
@@ -47,6 +48,7 @@ public class LoteService {
         log.info("Arquivo PDF recebido: {}", fileName);
         Map<Long, String> produtosAlertas = new LinkedHashMap<>();
         BigDecimal valorTotalEstimadoDestePDF = BigDecimal.ZERO;
+        List<ItemCarga> itensCarga = new ArrayList<>();
 
             String texto = extrairTextoDoPdf(file);
 
@@ -108,11 +110,11 @@ public class LoteService {
                 BigDecimal precoCobrado = new BigDecimal(precoString);
 
 
-                ItemConsignacao item = itemConsignacaoRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(produto.getCodigo(), lote.getId(), StatusItemLote.ENCARREGADO).orElse(null);
+                ItemLote item = itemLoteRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(produto.getCodigo(), lote.getId(), StatusItemLote.ENCARREGADO).orElse(null);
                 if(item != null){
                     item.setQuantidade(item.getQuantidade() + quantidade);
                 } else {
-                    item = ItemConsignacao.builder()
+                    item = ItemLote.builder()
                             .produto(produto)
                             .quantidade(quantidade)
                             .valorUnitarioCongelado(precoCobrado)
@@ -124,6 +126,7 @@ public class LoteService {
                 }
 
                 lote.getItens().add(item);
+                itensCarga.add(construirItemCarga(produto, quantidade, precoCobrado, consignacao));
 
                 // deduz do estoque
                 produto.setQuantidadeDisponivel(produto.getQuantidadeDisponivel() - quantidade);
@@ -146,10 +149,20 @@ public class LoteService {
             LoteConsignacao salvoLote = loteRepository.save(lote);
             log.info("Lote consignado com sucesso! Itens criados: {} | Itens com alerta: {}", itensCriados, itensAlertas);
 
-            salvarHistoricoDoDocumento(fileName, consignacao, TipoDocumento.MALETA_ENTRADA, revendedor, lote, valorTotalEstimadoDestePDF, itensCriados);
+            DocumentoMaleta documentoEntrada = salvarHistoricoDoDocumento(fileName, consignacao, TipoDocumento.MALETA_ENTRADA, revendedor, lote, valorTotalEstimadoDestePDF, itensCriados);
+            cargaService.criarCarga(documentoEntrada, itensCarga);
 
             return new ProcessamentoLoteResult(salvoLote, produtosAlertas, valorTotalEstimadoDestePDF, itensCriados);
 
+    }
+
+    private ItemCarga construirItemCarga(Produto produto, int quantidade, BigDecimal valorUnitarioCongelado, String consignacao) {
+        return ItemCarga.builder()
+                .produto(produto)
+                .quantidade(quantidade)
+                .valorUnitarioCongelado(valorUnitarioCongelado)
+                .documentoEntrada(consignacao)
+                .build();
     }
 
     @Transactional
@@ -188,7 +201,7 @@ public class LoteService {
             String quantidadeRaw = itemMatcher.group(3).trim();
             int quantidadeNoPdf = Integer.parseInt(quantidadeRaw.split(",")[0]);
 
-            ItemConsignacao item = itemConsignacaoRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(codigo, lote.getId(), StatusItemLote.ENCARREGADO)
+            ItemLote item = itemLoteRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(codigo, lote.getId(), StatusItemLote.ENCARREGADO)
                     .orElse(null);
 
             if(item != null){
@@ -198,7 +211,7 @@ public class LoteService {
                     // VENDA PARCIAL
                     item.setQuantidade(quantidadeNoBanco - quantidadeNoPdf);
 
-                    ItemConsignacao itemVendido = ItemConsignacao.builder()
+                    ItemLote itemVendido = ItemLote.builder()
                             .lote(lote)
                             .produto(item.getProduto())
                             .quantidade(quantidadeNoPdf)

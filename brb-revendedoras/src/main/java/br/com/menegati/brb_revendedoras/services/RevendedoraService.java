@@ -2,6 +2,7 @@ package br.com.menegati.brb_revendedoras.services;
 
 import br.com.menegati.brb_revendedoras.controller.AdminController;
 import br.com.menegati.brb_revendedoras.dto.revendedora.PainelRevendedoraResponseDTO;
+import br.com.menegati.brb_revendedoras.entity.CargaConsignacao;
 import br.com.menegati.brb_revendedoras.entity.DocumentoMaleta;
 import br.com.menegati.brb_revendedoras.entity.LoteConsignacao;
 import br.com.menegati.brb_revendedoras.entity.Revendedor;
@@ -12,6 +13,7 @@ import br.com.menegati.brb_revendedoras.exception.ResourceNotFoundException;
 import br.com.menegati.brb_revendedoras.entity.Acerto;
 import br.com.menegati.brb_revendedoras.mapper.PainelRevendedoraMapper;
 import br.com.menegati.brb_revendedoras.repository.AcertoRepository;
+import br.com.menegati.brb_revendedoras.repository.CargaConsignacaoRepository;
 import br.com.menegati.brb_revendedoras.repository.DocumentoMaletaRepository;
 import br.com.menegati.brb_revendedoras.repository.LoteRepository;
 import br.com.menegati.brb_revendedoras.repository.UserRepository;
@@ -29,6 +31,7 @@ public class RevendedoraService {
     private final LoteRepository loteRepository;
     private final DocumentoMaletaRepository documentoMaletaRepository;
     private final AcertoRepository acertoRepository;
+    private final CargaConsignacaoRepository cargaConsignacaoRepository;
     private final ContaCorrenteService contaCorrenteService;
 
 
@@ -42,12 +45,14 @@ public class RevendedoraService {
         LoteConsignacao loteAtual = loteRepository.findByRevendedorIdAndStatus(revendedora.getId(), StatusLote.ABERTO).orElse(null);
         List<DocumentoMaleta> historicoDocumentos = documentoMaletaRepository.findByRevendedorIdOrderByLoteIdDesc(revendedora.getId());
         List<Acerto> historicoAcertos = acertoRepository.findByRevendedorIdOrderByDataAcertoDesc(revendedora.getId());
+        List<CargaConsignacao> historicoCargas = cargaConsignacaoRepository.findByRevendedorIdOrderByDataAberturaDesc(revendedora.getId());
 
         PainelRevendedoraResponseDTO responseDTO = new PainelRevendedoraResponseDTO();
         responseDTO.setPerfil(mapper.toRevendedorDTO(revendedora, contaCorrenteService.getSaldoDevedor(revendedora.getId())));
         responseDTO.setLoteAtual(mapper.toLoteDTO(loteAtual));
         responseDTO.setHistoricoDocumentos(mapper.toDocumentoDTOList(historicoDocumentos));
         responseDTO.setHistoricoAcertos(mapper.toAcertoDTOList(historicoAcertos));
+        responseDTO.setHistoricoCargas(mapper.toCargaDTOList(historicoCargas));
 
         return responseDTO;
     }

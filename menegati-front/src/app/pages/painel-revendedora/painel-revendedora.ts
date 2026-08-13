@@ -2,7 +2,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { PainelHeader } from './components/painel-header/painel-header';
 import { VisaoGeral } from './components/visao-geral/visao-geral';
 import { MinhaMaleta } from './components/minha-maleta/minha-maleta';
-import { HistoricoAcertos } from './components/historico-acertos/historico-acertos';
+import { HistoricoMaleta } from './components/historico-maleta/historico-maleta';
+import { HistoricoDocumentos } from './components/historico-documentos/historico-documentos';
 import { MaterialApoio } from './components/material-apoio/material-apoio';
 import type { PainelTabId } from './painel-tabs';
 import { RevendedoraService } from '../../core/services/revendedora.service';
@@ -10,7 +11,7 @@ import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-painel-revendedora',
-  imports: [PainelHeader, VisaoGeral, MinhaMaleta, HistoricoAcertos, MaterialApoio],
+  imports: [PainelHeader, VisaoGeral, MinhaMaleta, HistoricoMaleta, HistoricoDocumentos, MaterialApoio],
   templateUrl: './painel-revendedora.html',
   styleUrl: './painel-revendedora.css',
 })

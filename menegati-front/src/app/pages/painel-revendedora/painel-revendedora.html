@@ -30,6 +30,7 @@
               [lote]="data.loteAtual"
               [itens]="data.loteAtual.itens"
               [historico]="data.historicoDocumentos"
+              [acertos]="data.historicoAcertos"
             ></app-visao-geral>
           }
           @case ('maleta') {
@@ -39,8 +40,16 @@
               (onMarcarVendido)="marcarComoVendido($event)"
             ></app-minha-maleta>
           }
-          @case ('historico') {
-            <app-historico-acertos [historico]="data.historicoDocumentos"></app-historico-acertos>
+          @case ('historico-maleta') {
+            <app-historico-maleta
+              [acertos]="data.historicoAcertos"
+              [cargas]="data.historicoCargas"
+            ></app-historico-maleta>
+          }
+          @case ('historico-documentos') {
+            <app-historico-documentos
+              [documentos]="data.historicoDocumentos"
+            ></app-historico-documentos>
           }
           @case ('material') {
             <app-material-apoio></app-material-apoio>

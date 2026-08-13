@@ -7,13 +7,13 @@ import {
 } from '../../../../core/models/painel-revendedora-data';
 
 @Component({
-  selector: 'app-historico-acertos',
+  selector: 'app-historico-documentos',
   imports: [CurrencyPipe],
-  templateUrl: './historico-acertos.html',
-  styleUrl: './historico-acertos.css',
+  templateUrl: './historico-documentos.html',
+  styleUrl: './historico-documentos.css',
 })
-export class HistoricoAcertos {
-  readonly historico = input.required<DocumentoMaleta[]>();
+export class HistoricoDocumentos {
+  readonly documentos = input.required<DocumentoMaleta[]>();
 
   protected readonly tipoLabel = TIPO_DOCUMENTO_LABEL;
 

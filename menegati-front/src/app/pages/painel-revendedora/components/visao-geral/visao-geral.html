@@ -118,6 +118,46 @@
   </div>
 </div>
 
+<!-- Situação financeira: saldo devedor real, vindo do razão (LancamentoFinanceiro), não da soma de itens -->
+<div
+  class="mt-5 flex flex-col justify-between gap-4 rounded-sm border p-6 shadow-sm sm:flex-row sm:items-center"
+  [class]="emDia() ? 'border-emerald-200 bg-emerald-50/50' : vencido() ? 'border-red-200 bg-red-50/50' : 'border-amber-200 bg-amber-50/50'"
+>
+  <div class="flex items-center gap-4">
+    <div
+      class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+      [class]="emDia() ? 'bg-emerald-100 text-emerald-600' : vencido() ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'"
+    >
+      @if (emDia()) {
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+        </svg>
+      } @else {
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      }
+    </div>
+    <div>
+      @if (emDia()) {
+        <p class="font-brand text-xl text-ink">Você está em dia ✓</p>
+        <p class="text-[12.5px] text-ink-soft">Nenhum valor em aberto com a loja no momento.</p>
+      } @else {
+        <p class="font-brand text-xl text-ink">
+          Em aberto: {{ revendedora().valorDevidoAtual | currency: 'BRL' }}
+        </p>
+        <p class="text-[12.5px]" [class]="vencido() ? 'text-red-600 font-medium' : 'text-ink-soft'">
+          @if (vencimentoAtual()) {
+            {{ vencido() ? 'Venceu em' : 'Vence em' }} {{ vencimentoAtual() }}
+          } @else {
+            Aguardando próximo acerto para confirmar o vencimento.
+          }
+        </p>
+      }
+    </div>
+  </div>
+</div>
+
 <!-- Distribuição da maleta atual por status -->
 <div class="mt-5 rounded-sm border border-line bg-paper p-6 shadow-sm">
   <div class="mb-5">

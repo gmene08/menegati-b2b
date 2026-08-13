@@ -5,6 +5,7 @@ import type {
   LoteAtual,
   RevendedoraPerfil,
   DocumentoMaleta,
+  Acerto,
   StatusItemLote,
 } from '../../../../core/models/painel-revendedora-data';
 
@@ -19,6 +20,27 @@ export class VisaoGeral {
   readonly lote = input.required<LoteAtual>();
   readonly itens = input.required<ItemConsignado[]>();
   readonly historico = input<DocumentoMaleta[]>([]);
+  readonly acertos = input<Acerto[]>([]);
+
+  // Dívida atual é o saldo devedor real, vindo do razão financeiro (ver CLAUDE.md
+  // raiz — "custódia ≠ financeiro"). O vencimento exibido é o do acerto mais recente,
+  // melhor indicador disponível hoje já que o backend ainda não expõe qual acerto
+  // específico está em aberto.
+  protected readonly emDia = computed(() => this.revendedora().valorDevidoAtual <= 0);
+
+  protected readonly acertoMaisRecente = computed(() => {
+    const acertos = this.acertos();
+    if (acertos.length === 0) return null;
+    return acertos.slice().sort((a, b) => this.parseDataBr(b.dataAcerto) - this.parseDataBr(a.dataAcerto))[0];
+  });
+
+  protected readonly vencimentoAtual = computed(() => this.acertoMaisRecente()?.dataVencimento ?? null);
+
+  protected readonly vencido = computed(() => {
+    const vencimento = this.vencimentoAtual();
+    if (!vencimento || this.emDia()) return false;
+    return this.parseDataBr(vencimento) < Date.now();
+  });
 
   // As peças da maleta passam por 3 estágios: ainda não vendidas (ENCARREGADO),
   // vendidas mas ainda não confirmadas pela loja (MARC_VENDIDO_REV), e já acertadas

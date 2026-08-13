@@ -31,9 +31,10 @@ public class LoteServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private LoteRepository loteRepository;
     @Mock private ProdutoRepository produtoRepository;
-    @Mock private ItemConsignacaoRepository itemConsignacaoRepository;
+    @Mock private ItemLoteRepository itemLoteRepository;
     @Mock private DocumentoMaletaRepository documentoMaletaRepository;
     @Mock private AcertoService acertoService;
+    @Mock private CargaService cargaService;
 
     @Spy
     @InjectMocks
@@ -110,14 +111,14 @@ public class LoteServiceTest {
                 .valorTotalEstimado(new BigDecimal("151.50")).valorTotalAcertado(new BigDecimal("0.00")).build();
 
         // No banco de dados, ela tinha pegado 3 peças
-        ItemConsignacao itemNoBanco = new ItemConsignacao();
+        ItemLote itemNoBanco = new ItemLote();
         itemNoBanco.setStatusItem(StatusItemLote.ENCARREGADO);
         itemNoBanco.setQuantidade(3);
         itemNoBanco.setValorUnitarioCongelado(new BigDecimal("50.50"));
 
         when(userRepository.findByCpf("51967545120")).thenReturn(Optional.of(revendedor));
         when(loteRepository.findByRevendedorIdAndStatus(any(), any())).thenReturn(Optional.of(lote));
-        when(itemConsignacaoRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(any(), any(), any())).thenReturn(Optional.of(itemNoBanco));
+        when(itemLoteRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(any(), any(), any())).thenReturn(Optional.of(itemNoBanco));
 
         LoteService.ProcessamentoLoteResult result = loteService.acertarCargaMaletaPdf(arquivoPdf);
 
@@ -128,7 +129,7 @@ public class LoteServiceTest {
         assertEquals(1, itemNoBanco.getQuantidade(), "O item original deve sobrar com 1 peça na maleta");
         assertEquals(StatusItemLote.ENCARREGADO, itemNoBanco.getStatusItem(), "O item original continua encarregado");
 
-        ItemConsignacao itemVendido = lote.getItens().get(0);
+        ItemLote itemVendido = lote.getItens().get(0);
         assertEquals(2, itemVendido.getQuantidade(), "O item espelho deve registrar 2 peças");
         assertEquals(StatusItemLote.ACERTADO_VENDIDO, itemVendido.getStatusItem(), "O item espelho deve estar vendido");
     }
@@ -150,14 +151,14 @@ public class LoteServiceTest {
                 .valorTotalEstimado(new BigDecimal("151.50")).valorTotalAcertado(new BigDecimal("0.00")).build();
 
         // No banco de dados, ela tinha 3 peças
-        ItemConsignacao itemNoBanco = new ItemConsignacao();
+        ItemLote itemNoBanco = new ItemLote();
         itemNoBanco.setStatusItem(StatusItemLote.ENCARREGADO);
         itemNoBanco.setQuantidade(3);
         itemNoBanco.setValorUnitarioCongelado(new BigDecimal("50.50"));
 
         when(userRepository.findByCpf("51967545120")).thenReturn(Optional.of(revendedor));
         when(loteRepository.findByRevendedorIdAndStatus(any(), any())).thenReturn(Optional.of(lote));
-        when(itemConsignacaoRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(any(), any(), any())).thenReturn(Optional.of(itemNoBanco));
+        when(itemLoteRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(any(), any(), any())).thenReturn(Optional.of(itemNoBanco));
 
         LoteService.ProcessamentoLoteResult result = loteService.acertarCargaMaletaPdf(arquivoPdf);
 
@@ -189,14 +190,14 @@ public class LoteServiceTest {
                 .valorTotalEstimado(new BigDecimal("151.50")).valorTotalAcertado(new BigDecimal("0.00")).build();
 
         // No banco de dados, ela só tinha  3 peças
-        ItemConsignacao itemNoBanco = new ItemConsignacao();
+        ItemLote itemNoBanco = new ItemLote();
         itemNoBanco.setStatusItem(StatusItemLote.ENCARREGADO);
         itemNoBanco.setQuantidade(3);
         itemNoBanco.setValorUnitarioCongelado(new BigDecimal("50.50"));
 
         when(userRepository.findByCpf("51967545120")).thenReturn(Optional.of(revendedor));
         when(loteRepository.findByRevendedorIdAndStatus(any(), any())).thenReturn(Optional.of(lote));
-        when(itemConsignacaoRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(any(), any(), any())).thenReturn(Optional.of(itemNoBanco));
+        when(itemLoteRepository.findFirstByProdutoCodigoAndLoteIdAndStatusItem(any(), any(), any())).thenReturn(Optional.of(itemNoBanco));
 
         LoteService.ProcessamentoLoteResult result = loteService.acertarCargaMaletaPdf(arquivoPdf);
 

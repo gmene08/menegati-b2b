@@ -1,6 +1,6 @@
 package br.com.menegati.brb_revendedoras.entity;
 
-import br.com.menegati.brb_revendedoras.enums.StatusLote;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +18,9 @@ import java.util.TimeZone;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "lote_consignacao")
-public class LoteConsignacao {
+@Table(name = "carga_consignacao")
+public class CargaConsignacao {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,22 +29,23 @@ public class LoteConsignacao {
     @JoinColumn(name = "revendedor_id", nullable = false)
     private Revendedor revendedor;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lote_id", nullable = false, updatable = false)
+    private LoteConsignacao lote;
+
     @Column(name = "data_abertura", nullable = false)
     private LocalDateTime dataAbertura = LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId());
-
-    @Column(name = "data_fechamento")
-    private LocalDateTime dataFechamento;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StatusLote status = StatusLote.ABERTO;
 
     @Column(name = "valor_total_estimado", precision = 10, scale = 2)
     private BigDecimal valorTotalEstimado = BigDecimal.ZERO;
 
-    @Column(name = "valor_total_acertado", precision = 10, scale = 2)
-    private BigDecimal valorTotalAcertado = BigDecimal.ZERO;
+    @Column(name = "quantidade_pecas")
+    private Integer quantidadePecas;
 
-    @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemLote> itens = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "documento_maleta_id", updatable = false)
+    private DocumentoMaleta documentoMaleta;
+
+    @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemCarga> itens = new ArrayList<>();
 }

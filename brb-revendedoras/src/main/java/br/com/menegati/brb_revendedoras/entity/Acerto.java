@@ -31,7 +31,7 @@ public class Acerto {
     @JoinColumn(name = "lote_id", nullable = false, updatable = false)
     private LoteConsignacao lote;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "documento_maleta_id", updatable = false)
     private DocumentoMaleta documentoMaleta;
 
