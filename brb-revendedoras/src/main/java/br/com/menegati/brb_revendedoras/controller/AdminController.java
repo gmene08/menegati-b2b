@@ -13,9 +13,11 @@ import br.com.menegati.brb_revendedoras.services.LoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,7 +66,7 @@ public class AdminController {
     }
 
     @PostMapping("/estoque/importar")
-    public ResponseEntity<ImportarEstoqueResponseDTO> registerEstoque(@RequestParam("file") MultipartFile file){
+    public ResponseEntity<ImportarEstoqueResponseDTO> registerEstoque(@RequestParam("file") MultipartFile file, Principal principal){
 
         if(file.isEmpty()){
             throw new BusinessException("O arquivo enviado está vazio");
@@ -74,8 +76,8 @@ public class AdminController {
             throw new BusinessException("Apenas arquivos .csv sao importados");
         }
 
-        List<Long> linhasIgnoradas = estoqueService.registerEstoque(file);
-        if(linhasIgnoradas.isEmpty()){
+        List<Long> linhasIgnoradas = estoqueService.registrarEstoque(file, principal.getName());
+        if(CollectionUtils.isEmpty(linhasIgnoradas)){
             return ResponseEntity.ok(new ImportarEstoqueResponseDTO(
                     "Todos os produtos foram importados com sucesso",
                     linhasIgnoradas,

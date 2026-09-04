@@ -1,8 +1,11 @@
 package br.com.menegati.brb_revendedoras.services;
 
-import br.com.menegati.brb_revendedoras.entity.Produto;
-import br.com.menegati.brb_revendedoras.exception.BusinessException;
+import br.com.menegati.brb_revendedoras.entity.*;
+import br.com.menegati.brb_revendedoras.exception.ResourceNotFoundException;
+import br.com.menegati.brb_revendedoras.repository.EntradaEstoqueRepository;
 import br.com.menegati.brb_revendedoras.repository.ProdutoRepository;
+import br.com.menegati.brb_revendedoras.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
@@ -19,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.TimeZone;
 
 @Slf4j
@@ -28,13 +30,18 @@ import java.util.TimeZone;
 public class EstoqueService {
 
     private final ProdutoRepository produtoRepository;
+    private final UserRepository userRepository;
+    private final EntradaEstoqueRepository entradaEstoqueRepository;
 
-    public List<Long> registerEstoque(MultipartFile file) {
+    @Transactional
+    public List<Long> registrarEstoque(MultipartFile file, String CPFRegistrador) {
+        Admin admin = (Admin) userRepository.findByCpf(CPFRegistrador).orElseThrow( () -> new ResourceNotFoundException("CPF inválido"));
+        List<ItemEntradaEstoque> itens = new ArrayList<>();
+        EntradaEstoque entradaEstoque = new EntradaEstoque();
+
         log.info("Arquivo CSV recebido: {}", file.getOriginalFilename());
         List<Long> linhasIgnoradas = new ArrayList<>();
         List<Produto> produtosParaSalvar = new ArrayList<>();
-
-
 
         try(
                 BufferedReader fileReader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.ISO_8859_1));
@@ -74,6 +81,8 @@ public class EstoqueService {
                     produto.setQuantidadeDisponivel(1);
                     produto.setAtivo(true);
 
+                    itens.add(criarItemEntradaEstoque(entradaEstoque,produto, 1));
+
                     produto.setUltimaAtualizacao(LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId()));
 
                     log.info("Produto {} da linha {} salvo com sucesso", codigo, record.getRecordNumber());
@@ -94,8 +103,27 @@ public class EstoqueService {
             throw new RuntimeException("Falha ao processar CSV de estoque: " + e);
         }
 
+        salvarEntradaEstoque(entradaEstoque,itens, admin.getName(), "Feito por documento csv: " + produtosParaSalvar.size() + " produtos salvos");
+        entradaEstoqueRepository.save(entradaEstoque);
+
         return linhasIgnoradas.isEmpty() ? null : linhasIgnoradas;
     }
+
+    private ItemEntradaEstoque criarItemEntradaEstoque(EntradaEstoque entradaEstoque,Produto produto, int quantidade){
+        ItemEntradaEstoque itemEntradaEstoque = new ItemEntradaEstoque();
+        itemEntradaEstoque.setEntrada(entradaEstoque);
+        itemEntradaEstoque.setQuantidade(quantidade);
+        itemEntradaEstoque.setProduto(produto);
+        return itemEntradaEstoque;
+    }
+
+
+    private void salvarEntradaEstoque(EntradaEstoque entradaEstoque, List<ItemEntradaEstoque> itens, String registradoPor, String observacao){
+        entradaEstoque.setItens(itens);
+        entradaEstoque.setRegistradoPor(registradoPor);
+        entradaEstoque.setObservacao(observacao);
+    }
+
 
     public boolean validarLinha(CSVRecord record){
         if(!record.isMapped("Codigo") || !record.isMapped("Nome") || !record.isMapped("Venda") || !record.isMapped("NCM")
