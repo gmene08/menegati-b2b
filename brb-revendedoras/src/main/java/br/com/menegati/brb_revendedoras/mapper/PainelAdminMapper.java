@@ -44,13 +44,13 @@ public interface PainelAdminMapper {
     PainelAdminService.ProcessamentoView toView(Acerto a);
 
     @Mapping(target = "tipo", constant = "ESTOQUE")
-    @Mapping(target = "origem", constant = "CSV")
+    @Mapping(target = "origem", expression = "java(e.getDocumentoEstoque() != null ? OrigemProcessamento.CSV : OrigemProcessamento.MANUAL)")
     @Mapping(target = "revendedora", ignore = true)
     @Mapping(target = "numeroDocumento", ignore = true)
-    @Mapping(target = "dataProcessamento", source = "dataProcessamento")
-    @Mapping(target = "quantidadeItens", source = "linhasSalvas")
+    @Mapping(target = "dataProcessamento", source = "dataEntrada")
+    @Mapping(target = "quantidadeItens", expression = "java(e.getItens().size())")
     @Mapping(target = "valorTotal", constant = "0")
-    PainelAdminService.ProcessamentoView toView(DocumentoEstoque e);
+    PainelAdminService.ProcessamentoView toView(EntradaEstoque e);
 
     PainelAdminResponseDTO.ProcessamentoDTO toProcessamentoDTO(PainelAdminService.ProcessamentoView view);
     List<PainelAdminResponseDTO.ProcessamentoDTO> toProcessamentoDTOList(List<PainelAdminService.ProcessamentoView> views);

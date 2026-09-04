@@ -27,6 +27,7 @@ public class DocumentoEstoque extends DocumentoBase{
     @Column(name = "linhas_ignoradas", nullable = false)
     private Integer linhasIgnoradas = 0 ;
 
-
+    @OneToOne(mappedBy = "documentoEstoque", fetch = FetchType.LAZY)
+    private EntradaEstoque entradaEstoque;
 
 }

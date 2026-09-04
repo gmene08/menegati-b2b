@@ -1,10 +1,12 @@
 package br.com.menegati.brb_revendedoras.services;
 
 import br.com.menegati.brb_revendedoras.entity.Admin;
+import br.com.menegati.brb_revendedoras.entity.DocumentoEstoque;
 import br.com.menegati.brb_revendedoras.entity.EntradaEstoque;
 import br.com.menegati.brb_revendedoras.entity.ItemEntradaEstoque;
 import br.com.menegati.brb_revendedoras.entity.Produto;
 import br.com.menegati.brb_revendedoras.exception.ResourceNotFoundException;
+import br.com.menegati.brb_revendedoras.repository.DocumentoEstoqueRepository;
 import br.com.menegati.brb_revendedoras.repository.EntradaEstoqueRepository;
 import br.com.menegati.brb_revendedoras.repository.ProdutoRepository;
 import br.com.menegati.brb_revendedoras.repository.UserRepository;
@@ -41,6 +43,9 @@ public class EstoqueServiceTest {
     @Mock
     private EntradaEstoqueRepository entradaEstoqueRepository;
 
+    @Mock
+    private DocumentoEstoqueRepository documentoEstoqueRepository;
+
     @InjectMocks
     private EstoqueService estoqueService;
 
@@ -49,6 +54,9 @@ public class EstoqueServiceTest {
 
     @Captor
     private ArgumentCaptor<EntradaEstoque> entradaEstoqueCaptor;
+
+    @Captor
+    private ArgumentCaptor<DocumentoEstoque> documentoEstoqueCaptor;
 
     private void mockAdminValido() {
         Admin adminFake = Admin.builder()
@@ -104,6 +112,15 @@ public class EstoqueServiceTest {
         assertTrue(itens.stream().allMatch(item -> item.getEntrada() == entradaSalva), "Cada item deve apontar de volta para a entrada");
         assertTrue(itens.stream().anyMatch(item -> "100001".equals(item.getProduto().getCodigo()) && item.getQuantidade() == 1));
         assertTrue(itens.stream().anyMatch(item -> "100002".equals(item.getProduto().getCodigo()) && item.getQuantidade() == 1));
+
+        verify(documentoEstoqueRepository, times(1)).save(documentoEstoqueCaptor.capture());
+        DocumentoEstoque documentoSalvo = documentoEstoqueCaptor.getValue();
+
+        assertEquals("estoque.csv", documentoSalvo.getNomeArquivo(), "Deve registrar o nome do arquivo importado");
+        assertEquals(2, documentoSalvo.getLinhasSalvas(), "Deve contar as linhas salvas com sucesso");
+        assertEquals(0, documentoSalvo.getLinhasIgnoradas(), "Nao deve ter linhas ignoradas nesse cenario");
+        assertSame(entradaSalva, documentoSalvo.getEntradaEstoque(), "Documento deve apontar para a entrada gerada");
+        assertSame(documentoSalvo, entradaSalva.getDocumentoEstoque(), "Entrada deve apontar de volta para o documento");
     }
 
     @Test
@@ -167,6 +184,6 @@ public class EstoqueServiceTest {
                 () -> estoqueService.registrarEstoque(arquivoFalso, cpfInvalido),
                 "Deve lançar ResourceNotFoundException quando o CPF não corresponde a um usuário");
 
-        verifyNoInteractions(produtoRepository, entradaEstoqueRepository);
+        verifyNoInteractions(produtoRepository, entradaEstoqueRepository, documentoEstoqueRepository);
     }
 }

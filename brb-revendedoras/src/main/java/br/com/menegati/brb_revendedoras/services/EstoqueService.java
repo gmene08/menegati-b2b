@@ -1,7 +1,9 @@
 package br.com.menegati.brb_revendedoras.services;
 
 import br.com.menegati.brb_revendedoras.entity.*;
+import br.com.menegati.brb_revendedoras.enums.TipoDocumento;
 import br.com.menegati.brb_revendedoras.exception.ResourceNotFoundException;
+import br.com.menegati.brb_revendedoras.repository.DocumentoEstoqueRepository;
 import br.com.menegati.brb_revendedoras.repository.EntradaEstoqueRepository;
 import br.com.menegati.brb_revendedoras.entity.Produto;
 import br.com.menegati.brb_revendedoras.repository.ProdutoRepository;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,12 +36,14 @@ public class EstoqueService {
     private final ProdutoRepository produtoRepository;
     private final UserRepository userRepository;
     private final EntradaEstoqueRepository entradaEstoqueRepository;
+    private final DocumentoEstoqueRepository documentoEstoqueRepository;
 
     @Transactional
     public List<Long> registrarEstoque(MultipartFile file, String CPFRegistrador) {
         Admin admin = (Admin) userRepository.findByCpf(CPFRegistrador).orElseThrow( () -> new ResourceNotFoundException("CPF inválido"));
         List<ItemEntradaEstoque> itens = new ArrayList<>();
         EntradaEstoque entradaEstoque = new EntradaEstoque();
+        DocumentoEstoque documentoEstoque = new DocumentoEstoque();
 
         log.info("Arquivo CSV recebido: {}", file.getOriginalFilename());
         List<Long> linhasIgnoradas = new ArrayList<>();
@@ -104,8 +109,13 @@ public class EstoqueService {
             throw new RuntimeException("Falha ao processar CSV de estoque: " + e);
         }
 
-        salvarEntradaEstoque(entradaEstoque,itens, admin.getName(), "Feito por documento csv: " + produtosParaSalvar.size() + " produtos salvos");
+        preencherEntradaEstoque(entradaEstoque, itens, admin.getName(),
+                "Feito por documento csv: " + produtosParaSalvar.size() + " produtos salvos");
+        vincularDocumentoEstoque(entradaEstoque, documentoEstoque,
+                file.getOriginalFilename(), produtosParaSalvar.size(), linhasIgnoradas.size());
+
         entradaEstoqueRepository.save(entradaEstoque);
+        documentoEstoqueRepository.save(documentoEstoque);
 
         return linhasIgnoradas.isEmpty() ? null : linhasIgnoradas;
     }
@@ -118,13 +128,21 @@ public class EstoqueService {
         return itemEntradaEstoque;
     }
 
-
-    private void salvarEntradaEstoque(EntradaEstoque entradaEstoque, List<ItemEntradaEstoque> itens, String registradoPor, String observacao){
+    private void preencherEntradaEstoque(EntradaEstoque entradaEstoque, List<ItemEntradaEstoque> itens, String registradoPor, String observacao){
         entradaEstoque.setItens(itens);
         entradaEstoque.setRegistradoPor(registradoPor);
         entradaEstoque.setObservacao(observacao);
     }
 
+    private void vincularDocumentoEstoque(EntradaEstoque entradaEstoque, DocumentoEstoque documentoEstoque,
+                                           String nomeArquivo, int linhasSalvas, int linhasIgnoradas){
+        documentoEstoque.setNomeArquivo(nomeArquivo);
+        documentoEstoque.setLinhasSalvas(linhasSalvas);
+        documentoEstoque.setLinhasIgnoradas(linhasIgnoradas);
+        documentoEstoque.setTipoDocumento(TipoDocumento.ESTOQUE_IMPORTE);
+        documentoEstoque.setEntradaEstoque(entradaEstoque);
+        entradaEstoque.setDocumentoEstoque(documentoEstoque);
+    }
 
     public boolean validarLinhaDocumentoEstoque(CSVRecord record){
         if(!record.isMapped("Codigo") || !record.isMapped("Nome") || !record.isMapped("Venda") || !record.isMapped("NCM")
@@ -176,5 +194,9 @@ public class EstoqueService {
 
     public List<Produto> getProdutos(){
         return produtoRepository.findAll();
+    }
+
+    public List<EntradaEstoque> getEntradasEstoque(){
+        return entradaEstoqueRepository.findAllByOrderByDataEntradaDesc(PageRequest.of(0, 20));
     }
 }

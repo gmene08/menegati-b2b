@@ -13,6 +13,7 @@ import java.util.List;
 public class ProcessamentoService {
     private final CargaService cargaService;
     private final AcertoService acertoService;
+    private final EstoqueService estoqueService;
     private final DocumentoService documentoService;
     private final PainelAdminMapper mapper;
 
@@ -21,7 +22,7 @@ public class ProcessamentoService {
 
         processamentos.addAll(cargaService.getCargasParaFeed().stream().map(mapper::toView).toList());
         processamentos.addAll(acertoService.getAcertosParaFeed().stream().map(mapper::toView).toList());
-        processamentos.addAll(documentoService.getDocumentosEstoqueParaFeed().stream().map(mapper::toView).toList());
+        processamentos.addAll(estoqueService.getEntradasEstoque().stream().map(mapper::toView).toList());
 
         processamentos.sort(Comparator.comparing(PainelAdminService.ProcessamentoView::dataProcessamento).reversed());
 

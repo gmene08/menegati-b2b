@@ -63,25 +63,24 @@ public class ContaCorrenteServiceTest {
     @Test
     @DisplayName("Saldo devedor deve somar apenas lançamentos da carteira DINHEIRO")
     void deveSomarApenasCarteiraDinheiro() {
-        List<LancamentoFinanceiro> lancamentos = List.of(
+        List<LancamentoFinanceiro> lancamentosDinheiro = List.of(
                 criarLancamento(CarteiraLancamento.DINHEIRO, new BigDecimal("60.00")),
-                criarLancamento(CarteiraLancamento.DINHEIRO, new BigDecimal("30.00")),
-                criarLancamento(CarteiraLancamento.CREDITO_PECAS, new BigDecimal("500.00"))
+                criarLancamento(CarteiraLancamento.DINHEIRO, new BigDecimal("30.00"))
         );
-        when(lancamentoFinanceiroRepository.findByRevendedorIdOrderByDataAsc(1L)).thenReturn(lancamentos);
+        when(lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(1L, CarteiraLancamento.DINHEIRO))
+                .thenReturn(lancamentosDinheiro);
 
         BigDecimal saldoDevedor = contaCorrenteService.getSaldoDevedor(1L);
 
-        assertEquals(new BigDecimal("90.00"), saldoDevedor, "Crédito de bônus (CREDITO_PECAS) não pode entrar no saldo devedor em reais");
+        assertEquals(new BigDecimal("90.00"), saldoDevedor, "Deve somar os lançamentos que a query já filtrou pela carteira DINHEIRO");
     }
 
     @Test
     @DisplayName("Saldo devedor deve ser zero quando só existem lançamentos de bônus")
     void deveRetornarZeroQuandoSoExisteBonus() {
-        List<LancamentoFinanceiro> lancamentos = List.of(
-                criarLancamento(CarteiraLancamento.CREDITO_PECAS, new BigDecimal("500.00"))
-        );
-        when(lancamentoFinanceiroRepository.findByRevendedorIdOrderByDataAsc(1L)).thenReturn(lancamentos);
+        // Uma query real filtrando por carteira=DINHEIRO nunca devolveria o lançamento de bônus (CREDITO_PECAS)
+        when(lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(1L, CarteiraLancamento.DINHEIRO))
+                .thenReturn(List.of());
 
         BigDecimal saldoDevedor = contaCorrenteService.getSaldoDevedor(1L);
 
@@ -91,7 +90,8 @@ public class ContaCorrenteServiceTest {
     @Test
     @DisplayName("Saldo devedor deve ser zero quando não há lançamentos")
     void deveRetornarZeroSemLancamentos() {
-        when(lancamentoFinanceiroRepository.findByRevendedorIdOrderByDataAsc(1L)).thenReturn(List.of());
+        when(lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(1L, CarteiraLancamento.DINHEIRO))
+                .thenReturn(List.of());
 
         BigDecimal saldoDevedor = contaCorrenteService.getSaldoDevedor(1L);
 
@@ -122,7 +122,8 @@ public class ContaCorrenteServiceTest {
         List<LancamentoFinanceiro> apenasDivida = List.of(
                 criarLancamento(CarteiraLancamento.DINHEIRO, new BigDecimal("600.00"))
         );
-        when(lancamentoFinanceiroRepository.findByRevendedorIdOrderByDataAsc(1L)).thenReturn(apenasDivida);
+        when(lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(1L, CarteiraLancamento.DINHEIRO))
+                .thenReturn(apenasDivida);
 
         contaCorrenteService.salvarPagamento(1L, 250f, FormaPagamento.PIX, null);
 
@@ -133,21 +134,22 @@ public class ContaCorrenteServiceTest {
 
         List<LancamentoFinanceiro> divida600MenosPago250 = List.of(
                 criarLancamento(CarteiraLancamento.DINHEIRO, TipoLancamento.DEBITO_ACERTO, new BigDecimal("600.00")),
-                criarLancamento(CarteiraLancamento.DINHEIRO, TipoLancamento.CREDITO_PAGAMENTO, new BigDecimal("250.00"))
+                criarLancamento(CarteiraLancamento.DINHEIRO, TipoLancamento.CREDITO_PAGAMENTO, new BigDecimal("-250.00"))
         );
-        when(lancamentoFinanceiroRepository.findByRevendedorIdOrderByDataAsc(1L)).thenReturn(divida600MenosPago250);
+        when(lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(1L, CarteiraLancamento.DINHEIRO))
+                .thenReturn(divida600MenosPago250);
 
         assertEquals(0, new BigDecimal("350.00").compareTo(contaCorrenteService.getSaldoDevedor(1L)),
                 "Após pagar 250 de uma dívida de 600, deve restar 350");
 
         contaCorrenteService.salvarPagamento(1L, 350f, FormaPagamento.PIX, null);
-        contaCorrenteService.salvarPagamento(1L, 350f, FormaPagamento.PIX, null);
         List<LancamentoFinanceiro> dividaQuitada = List.of(
                 criarLancamento(CarteiraLancamento.DINHEIRO, TipoLancamento.DEBITO_ACERTO, new BigDecimal("600.00")),
-                criarLancamento(CarteiraLancamento.DINHEIRO, TipoLancamento.CREDITO_PAGAMENTO, new BigDecimal("250.00")),
-                criarLancamento(CarteiraLancamento.DINHEIRO, TipoLancamento.CREDITO_PAGAMENTO, new BigDecimal("350.00"))
+                criarLancamento(CarteiraLancamento.DINHEIRO, TipoLancamento.CREDITO_PAGAMENTO, new BigDecimal("-250.00")),
+                criarLancamento(CarteiraLancamento.DINHEIRO, TipoLancamento.CREDITO_PAGAMENTO, new BigDecimal("-350.00"))
         );
-        when(lancamentoFinanceiroRepository.findByRevendedorIdOrderByDataAsc(1L)).thenReturn(dividaQuitada);
+        when(lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(1L, CarteiraLancamento.DINHEIRO))
+                .thenReturn(dividaQuitada);
 
         assertEquals(0, BigDecimal.ZERO.compareTo(contaCorrenteService.getSaldoDevedor(1L)),
                 "Após pagar o total da dívida, o saldo devedor deve zerar");
@@ -162,7 +164,8 @@ public class ContaCorrenteServiceTest {
         List<LancamentoFinanceiro> divida600 = List.of(
                 criarLancamento(CarteiraLancamento.DINHEIRO, new BigDecimal("600.00"))
         );
-        when(lancamentoFinanceiroRepository.findByRevendedorIdOrderByDataAsc(1L)).thenReturn(divida600);
+        when(lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(1L, CarteiraLancamento.DINHEIRO))
+                .thenReturn(divida600);
 
         assertThrows(BusinessException.class,
                 () -> contaCorrenteService.salvarPagamento(1L, 700f, FormaPagamento.PIX, null));

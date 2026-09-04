@@ -26,6 +26,10 @@ public class EntradaEstoque {
     @Column(name = "data_entrada", nullable = false, updatable = false)
     private LocalDateTime dataEntrada = LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId());
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "documento_estoque_id", updatable = false)
+    private DocumentoEstoque documentoEstoque;
+
     @Column(length = 500, updatable = false)
     private String observacao;
 
