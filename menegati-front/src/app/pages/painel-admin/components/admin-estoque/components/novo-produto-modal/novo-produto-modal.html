@@ -1,0 +1,96 @@
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" (click)="cancelar()">
+  <div class="w-full max-w-md rounded-sm border border-line bg-paper shadow-xl" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between border-b border-line px-6 py-5">
+      <h3 class="font-brand text-xl text-ink">Novo Produto</h3>
+      <button
+        type="button"
+        (click)="cancelar()"
+        class="flex h-8 w-8 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-paper-soft hover:text-ink"
+        aria-label="Fechar"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <div class="px-6 py-5">
+      <form class="flex flex-col gap-4" (ngSubmit)="confirmar()">
+        <div>
+          <label class="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink-soft uppercase">Código (SKU)</label>
+          <input
+            type="text"
+            placeholder="Ex.: 104994"
+            class="h-10 w-full rounded-sm border border-line bg-white px-3 text-[14px] text-ink focus:border-brand focus:outline-none"
+            [ngModel]="codigo()"
+            (ngModelChange)="codigo.set($event)"
+            name="codigo"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink-soft uppercase">Nome do Produto</label>
+          <input
+            type="text"
+            placeholder="Ex.: Anel Solitário Prata 925"
+            class="h-10 w-full rounded-sm border border-line bg-white px-3 text-[14px] text-ink focus:border-brand focus:outline-none"
+            [ngModel]="nome()"
+            (ngModelChange)="nome.set($event)"
+            name="nome"
+            required
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink-soft uppercase">Preço de Venda</label>
+            <div class="flex h-10 items-center gap-1.5 rounded-sm border border-line bg-white px-3 focus-within:border-brand">
+              <span class="text-[13px] text-ink-soft">R$</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0,00"
+                class="w-full border-none bg-transparent p-0 text-[14px] text-ink outline-none"
+                [ngModel]="precoVenda()"
+                (ngModelChange)="precoVenda.set($event)"
+                name="precoVenda"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink-soft uppercase">Quantidade Inicial</label>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              placeholder="0"
+              class="h-10 w-full rounded-sm border border-line bg-white px-3 text-[14px] text-ink focus:border-brand focus:outline-none"
+              [ngModel]="quantidadeDisponivel()"
+              (ngModelChange)="quantidadeDisponivel.set($event)"
+              name="quantidadeDisponivel"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="mt-2 flex justify-end gap-3">
+          <button
+            type="button"
+            (click)="cancelar()"
+            class="rounded-sm border border-line px-5 py-2.5 text-[13px] font-medium text-ink-soft transition-colors hover:bg-paper-soft"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="rounded-sm bg-brand px-6 py-2.5 text-[13px] font-medium tracking-wide text-white shadow-sm transition-colors hover:bg-brand-dark"
+          >
+            Adicionar ao Estoque
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

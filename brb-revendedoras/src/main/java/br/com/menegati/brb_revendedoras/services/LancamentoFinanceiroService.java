@@ -43,7 +43,7 @@ public class LancamentoFinanceiroService {
                 .data(pagamento.getDataPagamento())
                 .tipo(TipoLancamento.CREDITO_PAGAMENTO)
                 .carteira(CarteiraLancamento.DINHEIRO)
-                .valor(pagamento.getValor())
+                .valor(pagamento.getValor().negate()) // Valor negativo para creditar
                 .descricao(criarDescricao(pagamento))
                 .acerto(null)
                 .pagamentoId(pagamento.getId())
@@ -77,4 +77,5 @@ public class LancamentoFinanceiroService {
 
         return descricao.formatted(pagamento.getRevendedor().getName(), pagamento.getDataPagamento(), pagamento.getValor());
     }
+
 }

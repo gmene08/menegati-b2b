@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -331,4 +332,13 @@ public class LoteService {
 
         return documentoMaletaRepository.save(documentoMaleta);
     }
+
+    public Map<Long, BigDecimal> getValorTotalEstimadoPorRevendedora(){
+        return loteRepository.getValorTotalEstimadoPorRevendedor().stream().collect(
+                Collectors.toMap(
+                        o -> (Long) o[0],
+                        o -> (BigDecimal) o[1])
+        );
+    }
+
 }

@@ -1,0 +1,62 @@
+<div class="mb-8">
+  <h2 class="font-brand text-3xl text-ink">Carga & Acerto</h2>
+  <p class="mt-1 text-[14px] text-ink-soft">
+    Registe novas cargas de maleta e feche acertos, por importação de PDF ou lançamento manual.
+  </p>
+</div>
+
+<div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+  <app-nova-carga-card></app-nova-carga-card>
+  <app-novo-acerto-card></app-novo-acerto-card>
+</div>
+
+<!-- Log de processamentos: última trilha do que já foi importado/lançado -->
+<div class="mt-8 rounded-sm border border-line bg-paper shadow-sm">
+  <div class="border-b border-line px-6 py-5">
+    <h3 class="font-brand text-xl text-ink">Últimos Processamentos</h3>
+    <p class="text-[13px] text-ink-soft">Cargas, acertos e atualizações de estoque mais recentes</p>
+  </div>
+
+  <ul class="divide-y divide-line">
+    @for (p of processamentos(); track p.id) {
+      <li class="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-4">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">
+            <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+          <div>
+            <div class="flex items-center gap-2">
+              <p class="font-medium text-ink">{{ tipoLabel[p.tipo] }}</p>
+              <span class="inline-flex items-center rounded bg-paper-soft px-2 py-0.5 text-[10.5px] font-semibold tracking-wide text-ink-soft uppercase">
+                {{ origemLabel[p.origem] }}
+              </span>
+            </div>
+            <p class="mt-0.5 text-[13px] text-ink-soft">
+              @if (p.revendedora) {
+                {{ p.revendedora }} ·
+              }
+              Nº {{ p.numeroDocumento }} · {{ p.dataProcessamento }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 pl-14 text-[13px] sm:pl-0">
+          <div class="text-right">
+            <p class="text-ink-soft">Itens</p>
+            <p class="font-medium text-ink">{{ p.quantidadeItens }}</p>
+          </div>
+          @if (p.valorTotal > 0) {
+            <div class="text-right">
+              <p class="text-ink-soft">Valor</p>
+              <p class="font-medium text-ink">{{ p.valorTotal | currency: 'BRL' }}</p>
+            </div>
+          }
+        </div>
+      </li>
+    } @empty {
+      <li class="px-6 py-10 text-center text-[14px] text-ink-soft">Nenhum processamento registado ainda.</li>
+    }
+  </ul>
+</div>

@@ -1,0 +1,154 @@
+<div class="rounded-sm border border-line bg-paper shadow-sm">
+  <div class="border-b border-line px-6 py-5">
+    <div class="flex items-center gap-3">
+      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      </span>
+      <div>
+        <h3 class="font-brand text-xl text-ink">Nova Carga de Maleta</h3>
+        <p class="text-[13px] text-ink-soft">Registra peças entregues a uma revendedora</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-6 py-5">
+    <div class="mb-5">
+      <label class="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink-soft uppercase">Revendedora</label>
+      <select
+        class="h-10 w-full rounded-sm border border-line bg-white px-3 text-[14px] text-ink focus:border-brand focus:outline-none"
+        [ngModel]="revendedoraId()"
+        (ngModelChange)="revendedoraId.set($event)"
+      >
+        <option [ngValue]="null">Selecione uma revendedora...</option>
+        @for (r of revendedoras; track r.id) {
+          <option [ngValue]="r.id">{{ r.nome }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Alterna entre importar PDF e lançar manualmente -->
+    <div class="mb-5 grid grid-cols-2 gap-2 rounded-sm border border-line bg-paper-soft p-1">
+      <button
+        type="button"
+        (click)="modo.set('PDF')"
+        class="rounded-sm px-3 py-2 text-[13px] font-medium transition-colors"
+        [class]="modo() === 'PDF' ? 'bg-white text-brand shadow-sm' : 'text-ink-soft hover:text-ink'"
+      >
+        Importar PDF
+      </button>
+      <button
+        type="button"
+        (click)="modo.set('MANUAL')"
+        class="rounded-sm px-3 py-2 text-[13px] font-medium transition-colors"
+        [class]="modo() === 'MANUAL' ? 'bg-white text-brand shadow-sm' : 'text-ink-soft hover:text-ink'"
+      >
+        Lançar Manualmente
+      </button>
+    </div>
+
+    @if (modo() === 'PDF') {
+      <label
+        class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-sm border-2 border-dashed border-line bg-paper-soft px-6 py-10 text-center transition-colors hover:border-brand"
+      >
+        <svg class="h-8 w-8 text-ink-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3 3m3-3l3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+        </svg>
+        <span class="text-[13px] font-medium text-ink">Arraste o PDF da carga aqui ou clique para selecionar</span>
+        <span class="text-[12px] text-ink-soft">Documento de consignação em PDF</span>
+        <input type="file" accept="application/pdf" class="hidden" />
+      </label>
+    } @else {
+      <div class="overflow-hidden rounded-sm border border-line">
+        <table class="w-full border-collapse text-left">
+          <thead>
+            <tr class="bg-paper-soft text-[11px] tracking-wider text-ink-soft uppercase">
+              <th class="border-b border-line px-3 py-2.5 font-medium">Código</th>
+              <th class="border-b border-line px-3 py-2.5 font-medium">Produto</th>
+              <th class="border-b border-line px-3 py-2.5 text-center font-medium w-20">Qtd.</th>
+              <th class="border-b border-line px-3 py-2.5 text-right font-medium w-28">Valor Un.</th>
+              <th class="border-b border-line px-3 py-2.5 w-10"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-line">
+            @for (item of itens(); track $index) {
+              <tr>
+                <td class="px-3 py-2">
+                  <input
+                    type="text"
+                    placeholder="Código"
+                    class="h-8 w-full rounded-sm border border-line bg-white px-2 text-[13px] text-ink focus:border-brand focus:outline-none"
+                    [ngModel]="item.codigo"
+                    (ngModelChange)="atualizarItem($index, 'codigo', $event)"
+                  />
+                </td>
+                <td class="px-3 py-2">
+                  <input
+                    type="text"
+                    placeholder="Nome do produto"
+                    class="h-8 w-full rounded-sm border border-line bg-white px-2 text-[13px] text-ink focus:border-brand focus:outline-none"
+                    [ngModel]="item.produto"
+                    (ngModelChange)="atualizarItem($index, 'produto', $event)"
+                  />
+                </td>
+                <td class="px-3 py-2">
+                  <input
+                    type="number"
+                    min="1"
+                    class="h-8 w-full rounded-sm border border-line bg-white px-2 text-center text-[13px] text-ink focus:border-brand focus:outline-none"
+                    [ngModel]="item.quantidade"
+                    (ngModelChange)="atualizarItem($index, 'quantidade', $event)"
+                  />
+                </td>
+                <td class="px-3 py-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    class="h-8 w-full rounded-sm border border-line bg-white px-2 text-right text-[13px] text-ink focus:border-brand focus:outline-none"
+                    [ngModel]="item.valorUnitario"
+                    (ngModelChange)="atualizarItem($index, 'valorUnitario', $event)"
+                  />
+                </td>
+                <td class="px-3 py-2 text-center">
+                  <button
+                    type="button"
+                    (click)="removerItem($index)"
+                    class="flex h-7 w-7 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-red-50 hover:text-red-600"
+                    aria-label="Remover item"
+                  >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <button
+        type="button"
+        (click)="adicionarItem()"
+        class="mt-3 flex items-center gap-1.5 text-[13px] font-medium text-brand transition-colors hover:text-brand-dark"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Adicionar item
+      </button>
+
+      <div class="mt-4 flex items-center justify-between rounded-sm border border-line bg-paper-soft px-4 py-3 text-[13px]">
+        <span class="text-ink-soft">Valor total estimado da carga</span>
+        <span class="font-semibold text-ink">{{ valorTotal() | currency: 'BRL' }}</span>
+      </div>
+    }
+
+    <div class="mt-5 flex justify-end">
+      <button
+        type="button"
+        class="rounded-sm bg-brand px-6 py-2.5 text-[13px] font-medium tracking-wide text-white shadow-sm transition-colors hover:bg-brand-dark"
+      >
+        {{ modo() === 'PDF' ? 'Importar Carga' : 'Registrar Carga' }}
+      </button>
+    </div>
+  </div>
+</div>

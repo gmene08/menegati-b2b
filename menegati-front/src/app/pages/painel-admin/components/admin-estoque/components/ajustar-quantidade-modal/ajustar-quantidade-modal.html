@@ -1,0 +1,98 @@
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" (click)="cancelar()">
+  <div class="w-full max-w-md rounded-sm border border-line bg-paper shadow-xl" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between border-b border-line px-6 py-5">
+      <div>
+        <h3 class="font-brand text-xl text-ink">Ajustar Estoque</h3>
+        <p class="mt-0.5 text-[13px] text-ink-soft">{{ produto().nome }} · {{ produto().codigo }}</p>
+      </div>
+      <button
+        type="button"
+        (click)="cancelar()"
+        class="flex h-8 w-8 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-paper-soft hover:text-ink"
+        aria-label="Fechar"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <div class="px-6 py-5">
+      <div class="mb-5 rounded-sm border border-line bg-paper-soft px-4 py-3 text-[13px]">
+        <span class="text-ink-soft">Quantidade atual: </span>
+        <span class="font-semibold text-ink">{{ produto().quantidadeDisponivel }} un.</span>
+      </div>
+
+      <form class="flex flex-col gap-4" (ngSubmit)="confirmar()">
+        <div>
+          <label class="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink-soft uppercase">Movimento</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              (click)="tipo.set('ENTRADA')"
+              class="rounded-sm border px-3 py-2.5 text-[13px] font-medium transition-colors"
+              [class]="tipo() === 'ENTRADA' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-line text-ink-soft hover:bg-paper-soft'"
+            >
+              + Entrada
+            </button>
+            <button
+              type="button"
+              (click)="tipo.set('SAIDA')"
+              class="rounded-sm border px-3 py-2.5 text-[13px] font-medium transition-colors"
+              [class]="tipo() === 'SAIDA' ? 'border-red-500 bg-red-50 text-red-700' : 'border-line text-ink-soft hover:bg-paper-soft'"
+            >
+              − Saída
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink-soft uppercase">Quantidade</label>
+          <input
+            type="number"
+            min="1"
+            step="1"
+            placeholder="0"
+            class="h-10 w-full rounded-sm border border-line bg-white px-3 text-[14px] text-ink focus:border-brand focus:outline-none"
+            [ngModel]="quantidade()"
+            (ngModelChange)="quantidade.set($event)"
+            name="quantidade"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink-soft uppercase">Motivo</label>
+          <textarea
+            rows="2"
+            placeholder="Ex.: reposição, peça danificada, correção de contagem..."
+            class="w-full resize-none rounded-sm border border-line bg-white px-3 py-2 text-[14px] text-ink focus:border-brand focus:outline-none"
+            [ngModel]="motivo()"
+            (ngModelChange)="motivo.set($event)"
+            name="motivo"
+          ></textarea>
+        </div>
+
+        <div class="rounded-sm border border-line bg-paper-soft px-4 py-3 text-[13px]">
+          <span class="text-ink-soft">Quantidade após o ajuste: </span>
+          <span class="font-semibold" [class]="quantidadeResultante() < 0 ? 'text-red-600' : 'text-ink'">{{ quantidadeResultante() }} un.</span>
+        </div>
+
+        <div class="mt-2 flex justify-end gap-3">
+          <button
+            type="button"
+            (click)="cancelar()"
+            class="rounded-sm border border-line px-5 py-2.5 text-[13px] font-medium text-ink-soft transition-colors hover:bg-paper-soft"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="quantidadeResultante() < 0"
+            class="rounded-sm bg-brand px-6 py-2.5 text-[13px] font-medium tracking-wide text-white shadow-sm transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Confirmar Ajuste
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

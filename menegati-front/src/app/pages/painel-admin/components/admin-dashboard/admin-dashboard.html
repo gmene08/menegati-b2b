@@ -1,0 +1,118 @@
+<div class="mb-8">
+  <h2 class="font-brand text-3xl text-ink">Visão Geral</h2>
+  <p class="mt-1 text-[14px] text-ink-soft">Resumo financeiro e operacional da loja</p>
+</div>
+
+<!-- KPIs principais -->
+<div class="mb-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="flex items-center gap-4 rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-500">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <div>
+      <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Total em Aberto</p>
+      <h3 class="font-brand text-2xl text-ink">{{ totalEmAberto() | currency: 'BRL' }}</h3>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-4 rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <div>
+      <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Revendedoras em Atraso</p>
+      <h3 class="font-brand text-2xl text-ink">{{ totalEmAtraso() }}</h3>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-4 rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    </div>
+    <div>
+      <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Maletas Ativas</p>
+      <h3 class="font-brand text-2xl text-ink">{{ maletasAtivas() }}</h3>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-4 rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5M3.75 3h16.5M21.75 3h-1.5m0 0v11.25a2.25 2.25 0 01-2.25 2.25h-2.25m0 0v3.75m0-3.75h-6m6 3.75h-6m0-3.75V21" />
+      </svg>
+    </div>
+    <div>
+      <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Exposição Total</p>
+      <h3 class="font-brand text-2xl text-ink">{{ exposicaoTotal() | currency: 'BRL' }}</h3>
+      <p class="mt-0.5 text-[11.5px] text-ink-soft">peças em posse das revendedoras</p>
+    </div>
+  </div>
+</div>
+
+<!-- Alertas de atraso -->
+@if (alertasAtraso().length > 0) {
+  <div class="mb-5 rounded-sm border border-red-200 bg-red-50/50 p-6 shadow-sm">
+    <div class="mb-4 flex items-center gap-2">
+      <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+      </svg>
+      <h3 class="font-brand text-xl text-ink">Atenção — em atraso há mais de 30 dias</h3>
+    </div>
+    <ul class="divide-y divide-red-200/60">
+      @for (r of alertasAtraso(); track r.id) {
+        <li class="flex flex-col gap-1 py-3 text-[13.5px] sm:flex-row sm:items-center sm:justify-between">
+          <span class="text-ink">
+            <span class="font-medium">{{ r.nome }}</span> tem
+            <span class="font-semibold text-red-600">{{ r.saldoDevedor | currency: 'BRL' }}</span>
+            em aberto há <span class="font-semibold text-red-600">{{ r.diasAtraso }} dias</span>
+          </span>
+        </li>
+      }
+    </ul>
+  </div>
+}
+
+<!-- Maiores devedoras -->
+<div class="rounded-sm border border-line bg-paper shadow-sm">
+  <div class="border-b border-line px-6 py-5">
+    <h3 class="font-brand text-xl text-ink">Maiores Devedoras</h3>
+    <p class="text-[13px] text-ink-soft">Ordenado por saldo devedor</p>
+  </div>
+
+  <ul class="divide-y divide-line">
+    @for (r of maioresDevedoras(); track r.id) {
+      <li class="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-4">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-light font-brand text-base font-bold text-brand">
+            {{ r.nome.charAt(0) }}
+          </div>
+          <div>
+            <p class="font-medium text-ink">{{ r.nome }}</p>
+            <p class="text-[12.5px] text-ink-soft">{{ r.cpf }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 pl-14 text-[13px] sm:pl-0">
+          <div class="text-right">
+            <p class="text-ink-soft">Em aberto</p>
+            <p class="font-semibold text-ink">{{ r.saldoDevedor | currency: 'BRL' }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-ink-soft">Atraso</p>
+            <p class="font-medium" [class]="r.diasAtraso > 30 ? 'text-red-600' : r.diasAtraso > 0 ? 'text-amber-600' : 'text-ink'">
+              {{ r.diasAtraso > 0 ? r.diasAtraso + ' dias' : 'em dia' }}
+            </p>
+          </div>
+        </div>
+      </li>
+    } @empty {
+      <li class="px-6 py-10 text-center text-[14px] text-ink-soft">Nenhuma revendedora com saldo em aberto.</li>
+    }
+  </ul>
+</div>

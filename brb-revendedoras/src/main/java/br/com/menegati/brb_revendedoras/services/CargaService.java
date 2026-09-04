@@ -1,13 +1,16 @@
 package br.com.menegati.brb_revendedoras.services;
 
+import br.com.menegati.brb_revendedoras.dto.admin.PainelAdminResponseDTO;
 import br.com.menegati.brb_revendedoras.entity.CargaConsignacao;
 import br.com.menegati.brb_revendedoras.entity.DocumentoMaleta;
 import br.com.menegati.brb_revendedoras.entity.ItemCarga;
 import br.com.menegati.brb_revendedoras.enums.TipoDocumento;
 import br.com.menegati.brb_revendedoras.exception.BusinessException;
+import br.com.menegati.brb_revendedoras.mapper.PainelAdminMapper;
 import br.com.menegati.brb_revendedoras.repository.CargaConsignacaoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -48,5 +51,9 @@ public class CargaService {
         itens.forEach(item -> item.setCarga(carga));
 
         return cargaConsignacaoRepository.save(carga);
+    }
+
+    public List<CargaConsignacao> getCargasParaFeed(){
+        return cargaConsignacaoRepository.findAllByOrderByDataAberturaDesc(PageRequest.of(0, 20));
     }
 }

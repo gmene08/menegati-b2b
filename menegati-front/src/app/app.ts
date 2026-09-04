@@ -29,7 +29,8 @@ export class App implements OnInit {
         if (
           urlAtual.includes('/painel-revendedora') ||
           urlAtual.includes('/login') ||
-          urlAtual.includes('/redefinir-senha')
+          urlAtual.includes('/redefinir-senha') ||
+          urlAtual.includes('/painel-admin')
         ) {
           this.mostrarHeaderPadrao = false;
         } else {

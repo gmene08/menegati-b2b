@@ -1,0 +1,122 @@
+<header
+  class="sticky top-0 z-50 flex flex-col border-b border-line bg-paper shadow-[0_4px_6px_-3px_rgba(0,0,0,0.1)]"
+>
+  <!-- Topo: menu mobile / título, logo e perfil -->
+  <div class="content-container grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 py-3 md:px-8">
+    <div class="justify-self-start">
+      <!-- Menu mobile: substitui as abas por um botão de 3 linhas -->
+      <button
+        type="button"
+        class="flex h-9 w-9 items-center justify-center text-ink md:hidden"
+        [attr.aria-expanded]="menuOpen()"
+        aria-label="Abrir menu de navegação do painel"
+        (click)="toggleMenu()"
+      >
+        @if (menuOpen()) {
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        } @else {
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        }
+      </button>
+
+      <h1
+        class="hidden border-l border-line pl-3 text-[13px] font-semibold tracking-widest text-brand
+               uppercase md:inline-block"
+      >
+        Painel Administrativo
+      </h1>
+    </div>
+
+    <a
+      routerLink="/"
+      class="flex items-center gap-3 justify-self-center"
+      aria-label="Menegati Joias e Semijoias — página inicial"
+    >
+      <img
+        src="/logo-menegati.png"
+        alt="Menegati Joias e Semijoias"
+        class="block h-auto w-[130px] object-contain md:w-[170px]"
+      />
+    </a>
+
+    <div class="flex items-center justify-end gap-4 justify-self-end">
+      <div class="hidden flex-col text-right md:flex">
+        <span class="text-[13px] font-semibold text-ink">Olá, {{ nomeAdmin() }}</span>
+        <span class="text-[11px] tracking-wider text-ink-soft uppercase">Administração</span>
+      </div>
+
+      <div
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-light font-brand
+               text-lg font-bold text-brand"
+      >
+        {{ iniciais(nomeAdmin()) }}
+      </div>
+
+      <a
+        routerLink="/"
+        class="ml-2 shrink-0 text-ink-soft transition-colors hover:text-brand"
+        title="Sair do painel"
+        aria-label="Sair do painel"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          />
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Navegação por abas (desktop): troca o conteúdo da página, sem sair de /painel-admin -->
+  <nav
+    aria-label="Secções do painel"
+    class="content-container hidden h-[var(--header-nav-h)] items-stretch gap-6 px-5
+           text-[13px] font-medium tracking-wide md:flex md:px-8"
+  >
+    @for (tab of tabs; track tab.id) {
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="abaAtiva() === tab.id"
+        (click)="selecionarAba(tab.id)"
+        class="relative flex h-full shrink-0 items-center px-0 leading-none transition-colors after:absolute
+               after:bottom-0 after:left-0 after:h-0.5 after:w-full"
+        [class.text-brand]="abaAtiva() === tab.id"
+        [class.after:bg-brand]="abaAtiva() === tab.id"
+        [class.text-ink-soft]="abaAtiva() !== tab.id"
+        [class.hover:text-ink]="abaAtiva() !== tab.id"
+        [class.after:bg-transparent]="abaAtiva() !== tab.id"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </nav>
+
+  <!-- Navegação por abas (mobile): painel aberto pelo botão de 3 linhas -->
+  @if (menuOpen()) {
+    <nav aria-label="Secções do painel" class="border-t border-line bg-paper md:hidden">
+      <div class="content-container flex flex-col px-5 py-2">
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="abaAtiva() === tab.id"
+            (click)="selecionarAba(tab.id)"
+            class="flex items-center border-b border-line py-3.5 text-left text-[15px] transition-colors last:border-b-0"
+            [class.text-brand]="abaAtiva() === tab.id"
+            [class.font-semibold]="abaAtiva() === tab.id"
+            [class.text-ink]="abaAtiva() !== tab.id"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+    </nav>
+  }
+</header>

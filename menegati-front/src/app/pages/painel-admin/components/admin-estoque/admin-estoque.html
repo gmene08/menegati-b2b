@@ -1,0 +1,147 @@
+<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+  <div>
+    <h2 class="font-brand text-3xl text-ink">Estoque</h2>
+    <p class="mt-1 text-[14px] text-ink-soft">Catálogo global de produtos e ajuste manual de quantidade</p>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <button
+      type="button"
+      (click)="painelCsvAberto.set(!painelCsvAberto())"
+      class="flex items-center justify-center gap-2 rounded-sm border border-line px-5 py-2.5 text-[13px] font-medium text-ink transition-colors hover:bg-paper-soft"
+    >
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      Importar CSV
+    </button>
+    <button
+      type="button"
+      (click)="modalNovoProdutoAberto.set(true)"
+      class="flex items-center justify-center gap-2 rounded-sm bg-brand px-6 py-2.5 text-[13px] font-medium tracking-wide text-white shadow-sm transition-colors hover:bg-brand-dark"
+    >
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+      Novo Produto
+    </button>
+  </div>
+</div>
+
+@if (painelCsvAberto()) {
+  <div class="mb-6 rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <h3 class="mb-1 font-brand text-lg text-ink">Atualizar Catálogo via CSV</h3>
+    <p class="mb-4 text-[13px] text-ink-soft">
+      Substitui os dados do catálogo global (código, nome, preço, quantidade) pelos valores da planilha.
+    </p>
+    <label
+      class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-sm border-2 border-dashed border-line bg-paper-soft px-6 py-10 text-center transition-colors hover:border-brand"
+    >
+      <svg class="h-8 w-8 text-ink-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3 3m3-3l3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+      </svg>
+      <span class="text-[13px] font-medium text-ink">Arraste o arquivo .csv aqui ou clique para selecionar</span>
+      <span class="text-[12px] text-ink-soft">Formato esperado: código, nome, preço, quantidade</span>
+      <input type="file" accept=".csv" class="hidden" />
+    </label>
+    <div class="mt-4 flex justify-end gap-3">
+      <button
+        type="button"
+        (click)="painelCsvAberto.set(false)"
+        class="rounded-sm border border-line px-5 py-2.5 text-[13px] font-medium text-ink-soft transition-colors hover:bg-paper-soft"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="rounded-sm bg-brand px-6 py-2.5 text-[13px] font-medium tracking-wide text-white shadow-sm transition-colors hover:bg-brand-dark"
+      >
+        Enviar Arquivo
+      </button>
+    </div>
+  </div>
+}
+
+<div class="mb-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
+  <div class="rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Produtos Cadastrados</p>
+    <h3 class="font-brand text-2xl text-ink">{{ produtos().length }}</h3>
+  </div>
+  <div class="rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Peças em Estoque</p>
+    <h3 class="font-brand text-2xl text-ink">{{ totalItens() }}</h3>
+  </div>
+  <div class="rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Sem Estoque</p>
+    <h3 class="font-brand text-2xl" [class]="totalSemEstoque() > 0 ? 'text-red-600' : 'text-ink'">{{ totalSemEstoque() }}</h3>
+  </div>
+</div>
+
+<div class="overflow-hidden rounded-sm border border-line bg-paper shadow-sm">
+  <div class="border-b border-line px-4 py-4 sm:px-6 sm:py-5">
+    <div class="relative w-full sm:w-64">
+      <svg class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-ink-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input
+        type="text"
+        placeholder="Buscar por código ou nome..."
+        class="h-9 w-full rounded-sm border border-line bg-white pr-3 pl-9 text-[13px] text-ink focus:border-brand focus:outline-none"
+        [ngModel]="busca()"
+        (ngModelChange)="busca.set($event)"
+      />
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse text-left">
+      <thead>
+        <tr class="bg-paper-soft text-[12px] tracking-wider text-ink-soft uppercase">
+          <th class="border-b border-line px-6 py-4 font-medium w-28">Código</th>
+          <th class="border-b border-line px-6 py-4 font-medium">Produto</th>
+          <th class="border-b border-line px-6 py-4 text-right font-medium w-32">Preço</th>
+          <th class="border-b border-line px-6 py-4 text-center font-medium w-32">Disponível</th>
+          <th class="border-b border-line px-6 py-4 text-center font-medium w-40">Ação</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-line text-[14px] text-ink">
+        @for (p of produtosFiltrados(); track p.codigo) {
+          <tr class="transition-colors hover:bg-paper-soft/50">
+            <td class="px-6 py-3 font-mono text-ink-soft">{{ p.codigo }}</td>
+            <td class="px-6 py-3 font-medium">{{ p.nome }}</td>
+            <td class="px-6 py-3 text-right">{{ p.precoVenda | currency: 'BRL' }}</td>
+            <td class="px-6 py-3 text-center">
+              <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide" [class]="estoqueBadgeClasse(p)">
+                {{ p.quantidadeDisponivel }} un.
+              </span>
+            </td>
+            <td class="px-6 py-3 text-center">
+              <button
+                type="button"
+                (click)="produtoParaAjustar.set(p)"
+                class="rounded-sm border border-line px-3 py-1.5 text-[12px] font-medium text-ink transition-colors hover:border-brand hover:text-brand"
+              >
+                Ajustar
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="px-6 py-16 text-center text-[14px] text-ink-soft">Nenhum produto encontrado.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (produtoParaAjustar(); as produto) {
+  <app-ajustar-quantidade-modal
+    [produto]="produto"
+    (onConfirmar)="confirmarAjuste($event)"
+    (onCancelar)="produtoParaAjustar.set(null)"
+  ></app-ajustar-quantidade-modal>
+}
+
+@if (modalNovoProdutoAberto()) {
+  <app-novo-produto-modal
+    (onConfirmar)="confirmarNovoProduto($event)"
+    (onCancelar)="modalNovoProdutoAberto.set(false)"
+  ></app-novo-produto-modal>
+}

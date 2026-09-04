@@ -1,6 +1,8 @@
 package br.com.menegati.brb_revendedoras.entity;
 
 
+import br.com.menegati.brb_revendedoras.enums.OrigemProcessamento;
+import br.com.menegati.brb_revendedoras.enums.TipoProcessamento;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,4 +50,6 @@ public class CargaConsignacao {
 
     @OneToMany(mappedBy = "carga", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemCarga> itens = new ArrayList<>();
+
+
 }

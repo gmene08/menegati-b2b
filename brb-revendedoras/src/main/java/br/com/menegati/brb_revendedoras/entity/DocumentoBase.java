@@ -1,6 +1,8 @@
 package br.com.menegati.brb_revendedoras.entity;
 
+import br.com.menegati.brb_revendedoras.enums.OrigemProcessamento;
 import br.com.menegati.brb_revendedoras.enums.TipoDocumento;
+import br.com.menegati.brb_revendedoras.enums.TipoProcessamento;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +16,7 @@ import java.util.TimeZone;
 @MappedSuperclass
 @NoArgsConstructor
 @SuperBuilder
-public class DocumentoBase {
+public abstract class DocumentoBase{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,5 +31,6 @@ public class DocumentoBase {
 
     @Column(name="data_processamento",nullable = false, updatable = false)
     private LocalDateTime dataProcessamento = LocalDateTime.now(TimeZone.getTimeZone("America/Sao_Paulo").toZoneId());
+
 
 }
