@@ -1,0 +1,20 @@
+<div class="flex min-h-screen w-full flex-col bg-paper-soft font-body">
+  <app-admin-header [abaAtiva]="abaAtiva()" (abaChange)="mudarAba($event)"></app-admin-header>
+
+  <main class="content-container w-full flex-1 px-5 py-8 md:px-8 md:py-12">
+    @switch (abaAtiva()) {
+      @case ('visao-geral') {
+        <app-admin-dashboard></app-admin-dashboard>
+      }
+      @case ('revendedoras') {
+        <app-admin-revendedoras></app-admin-revendedoras>
+      }
+      @case ('estoque') {
+        <app-admin-estoque></app-admin-estoque>
+      }
+      @case ('maletas') {
+        <app-admin-maletas></app-admin-maletas>
+      }
+    }
+  </main>
+</div>

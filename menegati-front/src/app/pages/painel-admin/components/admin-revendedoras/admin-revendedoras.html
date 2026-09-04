@@ -1,0 +1,114 @@
+@if (revendedoraSelecionada(); as r) {
+  <app-revendedora-detalhe
+    [revendedora]="r"
+    [lancamentos]="lancamentosSelecionados()"
+    [acertos]="acertosSelecionados()"
+    (onVoltar)="fecharDetalhe()"
+  ></app-revendedora-detalhe>
+} @else {
+  <div class="mb-8">
+    <h2 class="font-brand text-3xl text-ink">Revendedoras</h2>
+    <p class="mt-1 text-[14px] text-ink-soft">Lista completa, ordenada por maior dívida ou atraso</p>
+  </div>
+
+  <div class="overflow-hidden rounded-sm border border-line bg-paper shadow-sm">
+    <div class="flex flex-wrap items-center gap-2 border-b border-line px-4 py-4 sm:px-6 sm:py-5">
+      <div class="relative w-full sm:w-64">
+        <svg class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-ink-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Buscar por nome ou CPF..."
+          class="h-9 w-full rounded-sm border border-line bg-white pr-3 pl-9 text-[13px] text-ink focus:border-brand focus:outline-none"
+          [ngModel]="busca()"
+          (ngModelChange)="busca.set($event)"
+        />
+      </div>
+
+      <select
+        [ngModel]="filtroStatus()"
+        (ngModelChange)="filtroStatus.set($event)"
+        class="h-9 rounded-sm border border-line bg-white px-2.5 text-[13px] text-ink focus:border-brand focus:outline-none"
+      >
+        <option value="TODOS">Todos os status</option>
+        <option value="EM_DIA">Em dia</option>
+        <option value="EM_ABERTO">Em aberto</option>
+        <option value="ATRASADA">Atrasada</option>
+      </select>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse text-left">
+        <thead>
+          <tr class="bg-paper-soft text-[12px] tracking-wider text-ink-soft uppercase">
+            <th class="border-b border-line px-6 py-4 font-medium">
+              <button type="button" (click)="alternarOrdenacao('nome')" class="flex items-center gap-1 uppercase tracking-wider transition-colors" [class.text-brand]="sortColuna() === 'nome'">
+                Revendedora
+              </button>
+            </th>
+            <th class="border-b border-line px-6 py-4 text-right font-medium">
+              <button type="button" (click)="alternarOrdenacao('saldoDevedor')" class="flex w-full items-center justify-end gap-1 uppercase tracking-wider transition-colors" [class.text-brand]="sortColuna() === 'saldoDevedor'">
+                Saldo Devedor
+              </button>
+            </th>
+            <th class="border-b border-line px-6 py-4 text-right font-medium">
+              <button type="button" (click)="alternarOrdenacao('exposicaoMaleta')" class="flex w-full items-center justify-end gap-1 uppercase tracking-wider transition-colors" [class.text-brand]="sortColuna() === 'exposicaoMaleta'">
+                Exposição
+              </button>
+            </th>
+            <th class="border-b border-line px-6 py-4 text-center font-medium">
+              <button type="button" (click)="alternarOrdenacao('diasAtraso')" class="flex w-full items-center justify-center gap-1 uppercase tracking-wider transition-colors" [class.text-brand]="sortColuna() === 'diasAtraso'">
+                Atraso
+              </button>
+            </th>
+            <th class="border-b border-line px-6 py-4 text-center font-medium">Status</th>
+            <th class="border-b border-line px-6 py-4 text-center font-medium">Ação</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-line text-[14px] text-ink">
+          @for (r of revendedorasFiltradas(); track r.id) {
+            <tr class="cursor-pointer transition-colors hover:bg-paper-soft/50" (click)="abrirDetalhe(r)">
+              <td class="px-6 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-light font-brand text-sm font-bold text-brand">
+                    {{ r.nome.charAt(0) }}
+                  </div>
+                  <div>
+                    <p class="font-medium text-ink">{{ r.nome }}</p>
+                    <p class="text-[12.5px] text-ink-soft">{{ r.cpf }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-3 text-right font-medium" [class]="r.saldoDevedor > 0 ? 'text-red-600' : 'text-ink'">
+                {{ r.saldoDevedor | currency: 'BRL' }}
+              </td>
+              <td class="px-6 py-3 text-right text-ink-soft">{{ r.exposicaoMaleta | currency: 'BRL' }}</td>
+              <td class="px-6 py-3 text-center text-ink-soft">
+                {{ r.diasAtraso > 0 ? r.diasAtraso + ' dias' : '—' }}
+              </td>
+              <td class="px-6 py-3 text-center">
+                <span class="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold tracking-wide" [class]="badgeClasse(r)">
+                  {{ statusLabel[status(r)] }}
+                </span>
+              </td>
+              <td class="px-6 py-3 text-center">
+                <button
+                  type="button"
+                  (click)="abrirDetalhe(r); $event.stopPropagation()"
+                  class="rounded-sm border border-brand px-3 py-1.5 text-[12px] font-medium text-brand transition-colors hover:bg-brand hover:text-white"
+                >
+                  Ver detalhes
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="px-6 py-16 text-center text-[14px] text-ink-soft">Nenhuma revendedora encontrada.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

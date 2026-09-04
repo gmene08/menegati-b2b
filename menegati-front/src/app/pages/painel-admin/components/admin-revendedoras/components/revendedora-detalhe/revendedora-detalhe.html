@@ -1,0 +1,172 @@
+<button
+  type="button"
+  (click)="voltar()"
+  class="mb-6 flex items-center gap-1.5 text-[13px] font-medium text-ink-soft transition-colors hover:text-brand"
+>
+  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+  Voltar para a lista
+</button>
+
+<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+  <div class="flex items-center gap-4">
+    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-light font-brand text-xl font-bold text-brand">
+      {{ revendedora().nome.charAt(0) }}
+    </div>
+    <div>
+      <div class="flex items-center gap-2.5">
+        <h2 class="font-brand text-2xl text-ink">{{ revendedora().nome }}</h2>
+        <span class="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium" [class]="badgeClasse(revendedora())">
+          {{ statusLabel[status(revendedora())] }}
+        </span>
+      </div>
+      <p class="mt-0.5 text-[13px] text-ink-soft">{{ revendedora().cpf }} · {{ revendedora().telefone }}</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <button
+      type="button"
+      (click)="modalAjusteAberto.set(true)"
+      class="rounded-sm border border-line px-5 py-2.5 text-[13px] font-medium text-ink transition-colors hover:bg-paper-soft"
+    >
+      Lançar Ajuste
+    </button>
+    <button
+      type="button"
+      (click)="modalPagamentoAberto.set(true)"
+      class="flex items-center gap-2 rounded-sm bg-brand px-5 py-2.5 text-[13px] font-medium tracking-wide text-white shadow-sm transition-colors hover:bg-brand-dark"
+    >
+      Registrar Pagamento
+    </button>
+  </div>
+</div>
+
+<!-- Cartões de saldo -->
+<div class="mb-5 grid grid-cols-1 gap-5 md:grid-cols-3">
+  <div class="rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Saldo Devedor</p>
+    <h3 class="font-brand text-2xl" [class]="revendedora().saldoDevedor > 0 ? 'text-red-600' : 'text-emerald-600'">
+      {{ revendedora().saldoDevedor | currency: 'BRL' }}
+    </h3>
+    <p class="mt-1 text-[12.5px] text-ink-soft">
+      @if (revendedora().diasAtraso > 0) {
+        Em atraso há {{ revendedora().diasAtraso }} dias
+      } @else {
+        Sem pendências
+      }
+    </p>
+  </div>
+
+  <div class="rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Crédito de Bônus</p>
+    <h3 class="font-brand text-2xl text-brand">{{ revendedora().saldoBonus }} <span class="font-body text-sm font-normal text-ink-soft">peças</span></h3>
+    <p class="mt-1 text-[12.5px] text-ink-soft">Crédito em peças, não abate dívida em reais</p>
+  </div>
+
+  <div class="rounded-sm border border-line bg-paper p-6 shadow-sm">
+    <p class="mb-1 text-[12px] font-semibold tracking-wider text-ink-soft uppercase">Exposição da Maleta</p>
+    <h3 class="font-brand text-2xl text-ink">{{ revendedora().exposicaoMaleta | currency: 'BRL' }}</h3>
+    <p class="mt-1 text-[12.5px] text-ink-soft">Mercadoria fisicamente com a revendedora — não é dívida</p>
+  </div>
+</div>
+
+<!-- Extrato -->
+<div class="mb-5 rounded-sm border border-line bg-paper shadow-sm">
+  <div class="border-b border-line px-6 py-5">
+    <h3 class="font-brand text-xl text-ink">Extrato</h3>
+    <p class="text-[13px] text-ink-soft">Lançamentos financeiros em ordem cronológica</p>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse text-left">
+      <thead>
+        <tr class="bg-paper-soft text-[12px] tracking-wider text-ink-soft uppercase">
+          <th class="border-b border-line px-6 py-3 font-medium">Data</th>
+          <th class="border-b border-line px-6 py-3 font-medium">Tipo</th>
+          <th class="border-b border-line px-6 py-3 font-medium">Descrição</th>
+          <th class="border-b border-line px-6 py-3 text-right font-medium">Valor</th>
+          <th class="border-b border-line px-6 py-3 text-right font-medium">Saldo</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-line text-[13.5px] text-ink">
+        @for (l of lancamentos(); track l.id) {
+          <tr class="transition-colors hover:bg-paper-soft/50">
+            <td class="px-6 py-3 whitespace-nowrap text-ink-soft">{{ l.data }}</td>
+            <td class="px-6 py-3 whitespace-nowrap">{{ tipoLancamentoLabel[l.tipo] }}</td>
+            <td class="px-6 py-3 text-ink-soft">{{ l.descricao }}</td>
+            <td class="px-6 py-3 text-right font-medium" [class]="l.valor >= 0 ? 'text-red-600' : 'text-emerald-600'">
+              {{ l.valor >= 0 ? '+' : '' }}{{ l.valor | currency: 'BRL' }}
+            </td>
+            <td class="px-6 py-3 text-right font-medium text-ink">{{ l.saldoApos | currency: 'BRL' }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="px-6 py-12 text-center text-[14px] text-ink-soft">Nenhum lançamento registado ainda.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Histórico de acertos -->
+<div class="rounded-sm border border-line bg-paper shadow-sm">
+  <div class="border-b border-line px-6 py-5">
+    <h3 class="font-brand text-xl text-ink">Histórico de Acertos</h3>
+    <p class="text-[13px] text-ink-soft">Fechamentos financeiros de cada ciclo</p>
+  </div>
+
+  <ul class="divide-y divide-line">
+    @for (a of acertos(); track a.documentoMaleta) {
+      <li class="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-start gap-4">
+          <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+          <div>
+            <div class="flex items-center gap-2">
+              <p class="font-medium text-ink">Consignação Nº {{ a.documentoMaleta }}</p>
+              <span class="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-medium" [class]="badgeAcertoClasse(a.status)">
+                {{ acertoStatusLabel(a.status) }}
+              </span>
+            </div>
+            <p class="mt-0.5 text-[13px] text-ink-soft">{{ a.dataAcerto }} · vencimento {{ a.dataVencimento }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 pl-15 text-[13px] sm:pl-0">
+          <div class="text-right">
+            <p class="text-ink-soft">Devido</p>
+            <p class="font-medium text-ink">{{ a.valorDevido | currency: 'BRL' }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-ink-soft">Pago</p>
+            <p class="font-medium text-ink">{{ a.valorPago | currency: 'BRL' }} de {{ a.valorDevido | currency: 'BRL' }}</p>
+          </div>
+        </div>
+      </li>
+    } @empty {
+      <li class="px-6 py-10 text-center text-[14px] text-ink-soft">Ainda não há acertos registados.</li>
+    }
+  </ul>
+</div>
+
+@if (modalPagamentoAberto()) {
+  <app-registrar-pagamento-modal
+    [nomeRevendedora]="revendedora().nome"
+    [saldoDevedor]="revendedora().saldoDevedor"
+    (onConfirmar)="confirmarPagamento($event)"
+    (onCancelar)="modalPagamentoAberto.set(false)"
+  ></app-registrar-pagamento-modal>
+}
+
+@if (modalAjusteAberto()) {
+  <app-lancar-ajuste-modal
+    [nomeRevendedora]="revendedora().nome"
+    [saldoDevedor]="revendedora().saldoDevedor"
+    (onConfirmar)="confirmarAjuste($event)"
+    (onCancelar)="modalAjusteAberto.set(false)"
+  ></app-lancar-ajuste-modal>
+}
