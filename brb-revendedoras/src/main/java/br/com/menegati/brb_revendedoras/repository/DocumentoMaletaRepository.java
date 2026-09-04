@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface DocumentoMaletaRepository extends JpaRepository<DocumentoMaleta, Long> {
+public interface DocumentoMaletaRepository extends DocumentoBaseRepository<DocumentoMaleta> {
 
     boolean existsByNumeroConsignacao(String numeroConsignacao);
 

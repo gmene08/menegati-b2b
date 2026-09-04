@@ -8,11 +8,16 @@ import br.com.menegati.brb_revendedoras.repository.AcertoRepository;
 import br.com.menegati.brb_revendedoras.repository.LancamentoFinanceiroRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +64,18 @@ public class AcertoService {
 
     private LocalDate calcularDataVencimento(LocalDate dataAcerto){
         return dataAcerto.plusDays(30);
+    }
+
+    public Map<Long, LocalDateTime> getUltimasDatasDeAcerto(){
+        return acertoRepository.getUltimaDataAcertoPorRevendedor().stream().collect(
+                Collectors.toMap(
+                        o -> (Long) o[0],
+                        o -> (LocalDateTime) o[1]
+                )
+        );
+    }
+
+    public List<Acerto> getAcertosParaFeed(){
+        return acertoRepository.findAllByOrderByDataAcertoDesc(PageRequest.of(0, 20));
     }
 }

@@ -1,5 +1,7 @@
 package br.com.menegati.brb_revendedoras.entity;
 
+import br.com.menegati.brb_revendedoras.enums.OrigemProcessamento;
+import br.com.menegati.brb_revendedoras.enums.TipoProcessamento;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -30,4 +32,5 @@ public class DocumentoMaleta extends DocumentoBase{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lote_id", nullable = false)
     private LoteConsignacao lote;
+
 }

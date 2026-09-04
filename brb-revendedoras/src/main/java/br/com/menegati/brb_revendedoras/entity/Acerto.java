@@ -1,5 +1,7 @@
 package br.com.menegati.brb_revendedoras.entity;
 
+import br.com.menegati.brb_revendedoras.enums.OrigemProcessamento;
+import br.com.menegati.brb_revendedoras.enums.TipoProcessamento;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,4 +57,6 @@ public class Acerto {
 
     @Column(name = "qtd_pecas_vendidas", nullable = false)
     private Integer qtdPecasVendidas;
+
+
 }

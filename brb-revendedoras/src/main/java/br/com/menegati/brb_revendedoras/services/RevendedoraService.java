@@ -12,11 +12,7 @@ import br.com.menegati.brb_revendedoras.exception.BusinessException;
 import br.com.menegati.brb_revendedoras.exception.ResourceNotFoundException;
 import br.com.menegati.brb_revendedoras.entity.Acerto;
 import br.com.menegati.brb_revendedoras.mapper.PainelRevendedoraMapper;
-import br.com.menegati.brb_revendedoras.repository.AcertoRepository;
-import br.com.menegati.brb_revendedoras.repository.CargaConsignacaoRepository;
-import br.com.menegati.brb_revendedoras.repository.DocumentoMaletaRepository;
-import br.com.menegati.brb_revendedoras.repository.LoteRepository;
-import br.com.menegati.brb_revendedoras.repository.UserRepository;
+import br.com.menegati.brb_revendedoras.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +29,7 @@ public class RevendedoraService {
     private final AcertoRepository acertoRepository;
     private final CargaConsignacaoRepository cargaConsignacaoRepository;
     private final ContaCorrenteService contaCorrenteService;
+    private final RevendedoraRepository revendedoraRepository;
 
 
     public PainelRevendedoraResponseDTO getRevendedoraData(String cpf) {
@@ -55,6 +52,10 @@ public class RevendedoraService {
         responseDTO.setHistoricoCargas(mapper.toCargaDTOList(historicoCargas));
 
         return responseDTO;
+    }
+
+    public List<Revendedor> getAllRevendedoras(){
+        return revendedoraRepository.findAll();
     }
 
 }

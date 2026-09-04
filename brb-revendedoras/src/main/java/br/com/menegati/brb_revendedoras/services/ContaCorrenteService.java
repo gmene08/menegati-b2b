@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,18 +36,15 @@ public class ContaCorrenteService {
     private final ExtratoMapper extratoMapper;
 
     public BigDecimal getSaldoDevedor(Long revendedorId) {
-        List<LancamentoFinanceiro> lancamentoFinanceiros = lancamentoFinanceiroRepository.findByRevendedorIdOrderByDataAsc(revendedorId);
+        List<LancamentoFinanceiro> lancamentoFinanceiros = lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(revendedorId, CarteiraLancamento.DINHEIRO);
         return lancamentoFinanceiros.stream()
-                .filter(l -> l.getCarteira() == CarteiraLancamento.DINHEIRO)
-                .map(l ->{
-                    if(l.getTipo() == TipoLancamento.DEBITO_ACERTO || l.getTipo() == TipoLancamento.AJUSTE_DEBITO){
-                        return l.getValor();
-                    }
-                    else {
-                        return l.getValor().negate();
-                    }
-                })
+                .map(LancamentoFinanceiro::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public Map<Long, BigDecimal> getSaldoDevedores() {
+        return lancamentoFinanceiroRepository.somarSaldosDevedores().stream()
+                .collect(Collectors.toMap(o -> (Long) o[0], o -> (BigDecimal) o[1]));
     }
 
     @Transactional
@@ -89,4 +88,5 @@ public class ContaCorrenteService {
         extratoResponseDTO.setLancamentos(extratoMapper.toLancamentoFinanceiroDTOList(lancamentos));
         return extratoResponseDTO;
     }
+
 }

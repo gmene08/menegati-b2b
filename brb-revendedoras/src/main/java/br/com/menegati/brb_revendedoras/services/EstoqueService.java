@@ -1,7 +1,6 @@
 package br.com.menegati.brb_revendedoras.services;
 
 import br.com.menegati.brb_revendedoras.entity.Produto;
-import br.com.menegati.brb_revendedoras.exception.BusinessException;
 import br.com.menegati.brb_revendedoras.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.TimeZone;
 
 @Slf4j
@@ -48,7 +46,7 @@ public class EstoqueService {
             log.info("Iniciando processamento do arquivo CSV");
             for (var record : csvParser) {
                 try{
-                    if(!validarLinha(record)){
+                    if(!validarLinhaDocumentoEstoque(record)){
                         linhasIgnoradas.add(record.getRecordNumber());
                         continue;
                     }
@@ -97,7 +95,7 @@ public class EstoqueService {
         return linhasIgnoradas.isEmpty() ? null : linhasIgnoradas;
     }
 
-    public boolean validarLinha(CSVRecord record){
+    public boolean validarLinhaDocumentoEstoque(CSVRecord record){
         if(!record.isMapped("Codigo") || !record.isMapped("Nome") || !record.isMapped("Venda") || !record.isMapped("NCM")
                 || !record.isMapped("CEST") || !record.isMapped("Unidade") || !record.isMapped("Barras"))
         {
@@ -143,5 +141,9 @@ public class EstoqueService {
          }
 
         return true;
+    }
+
+    public List<Produto> getProdutos(){
+        return produtoRepository.findAll();
     }
 }
