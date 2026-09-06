@@ -1,7 +1,6 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, input, linkedSignal, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MOCK_PRODUTOS } from '../../admin-mock-data';
 import type { ProdutoEstoque } from '../../../../core/models/admin-data';
 import { AjustarQuantidadeModal, type AjustarQuantidadePayload } from './components/ajustar-quantidade-modal/ajustar-quantidade-modal';
 import { NovoProdutoModal } from './components/novo-produto-modal/novo-produto-modal';
@@ -13,7 +12,12 @@ import { NovoProdutoModal } from './components/novo-produto-modal/novo-produto-m
   styleUrl: './admin-estoque.css',
 })
 export class AdminEstoque {
-  protected readonly produtos = signal(MOCK_PRODUTOS);
+  readonly estoque = input<ProdutoEstoque[]>([]);
+
+  // Cópia local editável do estoque vindo do backend: os ajustes manuais e o cadastro
+  // de novo produto ainda não têm endpoint, então vivem só no cliente por enquanto.
+  // linkedSignal ressincroniza sempre que o painel recarrega os dados.
+  protected readonly produtos = linkedSignal(() => this.estoque());
 
   protected readonly busca = signal('');
   protected readonly produtoParaAjustar = signal<ProdutoEstoque | null>(null);

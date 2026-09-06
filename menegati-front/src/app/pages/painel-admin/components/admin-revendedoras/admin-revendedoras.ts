@@ -1,8 +1,13 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MOCK_ACERTOS, MOCK_LANCAMENTOS, MOCK_REVENDEDORAS } from '../../admin-mock-data';
-import { STATUS_REVENDEDORA_LABEL, type RevendedoraResumo, type StatusRevendedora } from '../../../../core/models/admin-data';
+import {
+  STATUS_REVENDEDORA_LABEL,
+  type AcertoAdmin,
+  type LancamentoFinanceiro,
+  type RevendedoraResumo,
+  type StatusRevendedora,
+} from '../../../../core/models/admin-data';
 import { RevendedoraDetalhe } from './components/revendedora-detalhe/revendedora-detalhe';
 
 type ColunaOrdenavel = 'nome' | 'saldoDevedor' | 'diasAtraso' | 'exposicaoMaleta';
@@ -14,7 +19,7 @@ type ColunaOrdenavel = 'nome' | 'saldoDevedor' | 'diasAtraso' | 'exposicaoMaleta
   styleUrl: './admin-revendedoras.css',
 })
 export class AdminRevendedoras {
-  private readonly revendedoras = signal(MOCK_REVENDEDORAS);
+  readonly revendedoras = input<RevendedoraResumo[]>([]);
 
   protected readonly statusLabel = STATUS_REVENDEDORA_LABEL;
 
@@ -63,15 +68,11 @@ export class AdminRevendedoras {
     return this.revendedoras().find((r) => r.id === id) ?? null;
   });
 
-  protected readonly lancamentosSelecionados = computed(() => {
-    const id = this.revendedoraSelecionadaId();
-    return id !== null ? (MOCK_LANCAMENTOS[id] ?? []) : [];
-  });
-
-  protected readonly acertosSelecionados = computed(() => {
-    const id = this.revendedoraSelecionadaId();
-    return id !== null ? (MOCK_ACERTOS[id] ?? []) : [];
-  });
+  // TODO: o extrato de lançamentos e o histórico de acertos por revendedora ainda não
+  // são servidos pelo GET /api/admin — virão de um endpoint próprio
+  // (ex. GET /api/admin/revendedora/{id}/extrato). Até lá o detalhe abre vazio.
+  protected readonly lancamentosSelecionados = signal<LancamentoFinanceiro[]>([]);
+  protected readonly acertosSelecionados = signal<AcertoAdmin[]>([]);
 
   protected alternarOrdenacao(coluna: ColunaOrdenavel): void {
     if (this.sortColuna() === coluna) {

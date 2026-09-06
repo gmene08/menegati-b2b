@@ -13,6 +13,7 @@ describe('LoginForm', () => {
 
     fixture = TestBed.createComponent(LoginForm);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('errorMessage', '');
     await fixture.whenStable();
   });
 

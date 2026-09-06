@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { VoltarButton } from './voltar-button';
 
@@ -9,6 +10,7 @@ describe('VoltarButton', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [VoltarButton],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(VoltarButton);

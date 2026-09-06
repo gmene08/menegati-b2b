@@ -14,7 +14,6 @@ public class ProcessamentoService {
     private final CargaService cargaService;
     private final AcertoService acertoService;
     private final EstoqueService estoqueService;
-    private final DocumentoService documentoService;
     private final PainelAdminMapper mapper;
 
     public List<PainelAdminService.ProcessamentoView> getUltimosProcessamentos(){

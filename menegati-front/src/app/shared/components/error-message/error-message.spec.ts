@@ -13,6 +13,7 @@ describe('ErrorMessage', () => {
 
     fixture = TestBed.createComponent(ErrorMessage);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('message', '');
     await fixture.whenStable();
   });
 

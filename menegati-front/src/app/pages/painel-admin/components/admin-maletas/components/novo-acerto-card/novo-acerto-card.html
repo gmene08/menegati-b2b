@@ -23,7 +23,7 @@
           (ngModelChange)="revendedoraId.set($event)"
         >
           <option [ngValue]="null">Selecione uma revendedora...</option>
-          @for (r of revendedoras; track r.id) {
+          @for (r of revendedoras(); track r.id) {
             <option [ngValue]="r.id">{{ r.nome }}</option>
           }
         </select>

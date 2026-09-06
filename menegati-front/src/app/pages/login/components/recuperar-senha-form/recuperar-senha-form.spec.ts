@@ -13,6 +13,9 @@ describe('RecuperarSenhaForm', () => {
 
     fixture = TestBed.createComponent(RecuperarSenhaForm);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('message', '');
+    fixture.componentRef.setInput('errorMessage', '');
+    fixture.componentRef.setInput('isLoading', false);
     await fixture.whenStable();
   });
 

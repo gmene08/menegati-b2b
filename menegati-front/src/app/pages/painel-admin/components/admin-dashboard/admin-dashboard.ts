@@ -1,6 +1,6 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
-import { MOCK_REVENDEDORAS } from '../../admin-mock-data';
+import type { RevendedoraResumo } from '../../../../core/models/admin-data';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -9,7 +9,7 @@ import { MOCK_REVENDEDORAS } from '../../admin-mock-data';
   styleUrl: './admin-dashboard.css',
 })
 export class AdminDashboard {
-  private readonly revendedoras = signal(MOCK_REVENDEDORAS);
+  readonly revendedoras = input<RevendedoraResumo[]>([]);
 
   protected readonly totalEmAberto = computed(() =>
     this.revendedoras().reduce((soma, r) => soma + r.saldoDevedor, 0),

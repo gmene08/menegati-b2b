@@ -1,8 +1,7 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MOCK_REVENDEDORAS } from '../../../../admin-mock-data';
-import type { ItemLancamentoManual } from '../../../../../../core/models/admin-data';
+import type { ItemLancamentoManual, RevendedoraResumo } from '../../../../../../core/models/admin-data';
 
 type ModoEntrada = 'PDF' | 'MANUAL';
 
@@ -13,7 +12,7 @@ type ModoEntrada = 'PDF' | 'MANUAL';
   styleUrl: './nova-carga-card.css',
 })
 export class NovaCargaCard {
-  protected readonly revendedoras = MOCK_REVENDEDORAS;
+  readonly revendedoras = input<RevendedoraResumo[]>([]);
   protected readonly revendedoraId = signal<number | null>(null);
   protected readonly modo = signal<ModoEntrada>('PDF');
 

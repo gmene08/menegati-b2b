@@ -88,3 +88,9 @@ export interface ProcessamentoLog {
   quantidadeItens: number;
   valorTotal: number;
 }
+
+export interface PainelAdminData {
+  revendedoras: RevendedoraResumo[];
+  estoque: ProdutoEstoque[];
+  processamentos: ProcessamentoLog[];
+}

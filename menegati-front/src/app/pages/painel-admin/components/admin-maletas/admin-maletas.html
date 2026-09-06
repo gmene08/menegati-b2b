@@ -6,8 +6,8 @@
 </div>
 
 <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-  <app-nova-carga-card></app-nova-carga-card>
-  <app-novo-acerto-card></app-novo-acerto-card>
+  <app-nova-carga-card [revendedoras]="revendedoras()"></app-nova-carga-card>
+  <app-novo-acerto-card [revendedoras]="revendedoras()"></app-novo-acerto-card>
 </div>
 
 <!-- Log de processamentos: última trilha do que já foi importado/lançado -->
@@ -18,7 +18,7 @@
   </div>
 
   <ul class="divide-y divide-line">
-    @for (p of processamentos(); track p.id) {
+    @for (p of processamentos(); track p.tipo + '-' + p.id) {
       <li class="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-4">
           <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">
@@ -37,7 +37,10 @@
               @if (p.revendedora) {
                 {{ p.revendedora }} ·
               }
-              Nº {{ p.numeroDocumento }} · {{ p.dataProcessamento }}
+              @if (p.numeroDocumento) {
+                Nº {{ p.numeroDocumento }} ·
+              }
+              {{ p.dataProcessamento | date: 'dd/MM/yyyy' }}
             </p>
           </div>
         </div>

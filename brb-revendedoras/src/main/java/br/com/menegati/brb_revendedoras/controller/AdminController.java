@@ -1,15 +1,13 @@
 package br.com.menegati.brb_revendedoras.controller;
 
+import br.com.menegati.brb_revendedoras.dto.admin.PainelAdminResponseDTO;
 import br.com.menegati.brb_revendedoras.dto.auth.RegisterRequestDTO;
 import br.com.menegati.brb_revendedoras.dto.revendedora.ExtratoResponseDTO;
 import br.com.menegati.brb_revendedoras.entity.LoteConsignacao;
 import br.com.menegati.brb_revendedoras.enums.FormaPagamento;
 import br.com.menegati.brb_revendedoras.enums.Role;
 import br.com.menegati.brb_revendedoras.exception.BusinessException;
-import br.com.menegati.brb_revendedoras.services.AuthService;
-import br.com.menegati.brb_revendedoras.services.ContaCorrenteService;
-import br.com.menegati.brb_revendedoras.services.EstoqueService;
-import br.com.menegati.brb_revendedoras.services.LoteService;
+import br.com.menegati.brb_revendedoras.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +29,7 @@ public class AdminController {
     private final EstoqueService estoqueService;
     private final LoteService loteService;
     private final ContaCorrenteService contaCorrenteService;
+    private final PainelAdminService painelAdminService;
 
     public record ImportarEstoqueResponseDTO(String message, List<Long> linhasIgnoradas, int quantidadeLinhas) {}
 
@@ -58,6 +57,12 @@ public class AdminController {
     public record PagamentoResponseDTO(String message) {}
 
     public record SaldoResponseDTO(float saldo) {}
+
+    @GetMapping
+    public ResponseEntity<PainelAdminResponseDTO> getPainelAdminData(){
+        PainelAdminResponseDTO responseDTO = painelAdminService.getPainelAdminData();
+        return ResponseEntity.ok(responseDTO);
+    }
 
     @PostMapping("/register/{role}")
     public ResponseEntity<Void> register(@RequestBody RegisterRequestDTO registerData, @PathVariable String role){
