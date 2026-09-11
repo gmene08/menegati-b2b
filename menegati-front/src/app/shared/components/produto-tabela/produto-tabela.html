@@ -1,0 +1,169 @@
+<div class="overflow-hidden rounded-sm border border-line bg-paper shadow-sm">
+  @if (buscavel() || titulo()) {
+    <div class="border-b border-line px-4 py-4 sm:px-6 sm:py-5">
+      @if (titulo(); as t) {
+        <h3 class="mb-3 font-brand text-xl text-ink">{{ t }}</h3>
+      }
+
+      <div class="flex flex-wrap items-center gap-2">
+        @if (buscavel()) {
+          <div class="relative w-full sm:w-56">
+            <svg
+              class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-ink-soft"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              [placeholder]="buscaPlaceholder()"
+              class="h-9 w-full rounded-sm border border-line bg-white pr-3 pl-9 text-[13px] text-ink focus:border-brand focus:outline-none"
+              [ngModel]="busca()"
+              (ngModelChange)="busca.set($event); aoBuscar()"
+            />
+          </div>
+        }
+
+        <!-- Filtros extras específicos de cada tela -->
+        <ng-content select="[filtros]" />
+      </div>
+    </div>
+  }
+
+  <div class="overflow-x-auto min-h-[380px]">
+    <table class="w-full border-collapse text-left">
+      <thead>
+        <tr class="bg-paper-soft text-[12px] tracking-wider text-ink-soft uppercase">
+          @for (coluna of colunas(); track coluna.chave) {
+            <th class="border-b border-line px-6 py-4 font-medium" [class]="classeCabecalho(coluna)">
+              @if (coluna.ordenavel) {
+                <button
+                  type="button"
+                  (click)="alternarOrdenacao(coluna)"
+                  class="flex items-center gap-1 whitespace-nowrap uppercase tracking-wider transition-colors"
+                  [class]="classeBotao(coluna)"
+                  [class.text-brand]="sortColuna() === coluna.chave"
+                  [class.font-bold]="sortColuna() === coluna.chave"
+                  [class.hover:text-ink]="sortColuna() !== coluna.chave"
+                >
+                  {{ coluna.titulo }}
+                  <svg
+                    class="h-3 w-3 shrink-0 transition-all"
+                    [class.opacity-0]="sortColuna() !== coluna.chave"
+                    [class.rotate-180]="sortColuna() === coluna.chave && sortDirecao() === 'desc'"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                  </svg>
+                </button>
+              } @else {
+                {{ coluna.titulo }}
+              }
+            </th>
+          }
+          <th class="border-b border-line px-6 py-4 text-center font-medium" [class]="larguraAcao()">
+            {{ acaoTitulo() }}
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-line text-[14px] text-ink">
+        @for (linha of linhasVisiveis(); track linha.codigo) {
+          <tr class="h-[72px] transition-colors hover:bg-paper-soft/50">
+            @for (coluna of colunas(); track coluna.chave) {
+              @switch (coluna.formato ?? 'texto') {
+                @case ('mono') {
+                  <td class="px-6 py-2 font-mono text-ink-soft">{{ valorTexto(linha, coluna) }}</td>
+                }
+                @case ('principal') {
+                  <td class="px-6 py-2 font-medium">
+                    <span class="line-clamp-2" [title]="valorTexto(linha, coluna)">{{
+                      valorTexto(linha, coluna)
+                    }}</span>
+                  </td>
+                }
+                @case ('moeda') {
+                  <td class="px-6 py-2" [class]="classeAlinhamento(coluna)">
+                    {{ valorMoeda(linha, coluna) | currency: 'BRL' }}
+                  </td>
+                }
+
+                @case ('template') {
+                  <td class="px-6 py-2" [class]="classeAlinhamento(coluna)">
+                    <!-- Aqui o filho pega o molde do pai e carimba, injetando a 'linha' atual -->
+                    <ng-container
+                      [ngTemplateOutlet]="templatePara(coluna.chave)"
+                      [ngTemplateOutletContext]="{ $implicit: linha }"
+                    />
+                  </td>
+                }
+
+                @default {
+                  <td class="px-6 py-2" [class]="classeAlinhamento(coluna)">
+                    {{ valorTexto(linha, coluna) }}
+                  </td>
+                }
+              }
+            }
+            <td class="px-6 py-2 text-center">
+              <ng-container
+                [ngTemplateOutlet]="templatePara('acao')"
+                [ngTemplateOutletContext]="{ $implicit: linha }"
+              />
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="colunas().length + 1"
+                class="px-6 py-16 text-center text-[14px] text-ink-soft">
+              Nenhum registro encontrado.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (paginavel()) {
+    <div class="flex flex-col items-center justify-between gap-4 border-t border-line bg-paper-soft px-6 py-4 sm:flex-row">
+    <span class="text-[13px] text-ink-soft">
+      Mostrando
+      <span class="font-medium text-ink">{{
+          linhasFiltradas().length > 0 ? (pagina() - 1) * itensPorPagina() + 1 : 0
+        }}</span>
+      a
+      <span class="font-medium text-ink">{{
+          mathMin(pagina() * itensPorPagina(), linhasFiltradas().length)
+        }}</span>
+      de <span class="font-medium text-ink">{{ linhasFiltradas().length }}</span> registros
+    </span>
+
+      <div class="flex items-center gap-2">
+        <button
+          (click)="mudarPagina(-1)"
+          [disabled]="pagina() === 1"
+          class="flex items-center justify-center rounded-sm border border-line bg-white px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:bg-paper-soft disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Anterior
+        </button>
+
+        <span class="px-2 text-[13px] text-ink-soft">Pág. {{ pagina() }} de {{ totalDePaginas() }}</span>
+
+        <button
+          (click)="mudarPagina(1)"
+          [disabled]="pagina() === totalDePaginas()"
+          class="flex items-center justify-center rounded-sm border border-line bg-white px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:bg-paper-soft disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Próxima
+        </button>
+      </div>
+    </div>
+  }
+
+</div>
