@@ -42,8 +42,11 @@
       <thead>
         <tr class="bg-paper-soft text-[12px] tracking-wider text-ink-soft uppercase">
           @for (coluna of colunas(); track coluna.chave) {
-            <th class="border-b border-line px-6 py-4 font-medium" [class]="classeCabecalho(coluna)">
-              @if (coluna.ordenavel) {
+            <th
+              class="border-b border-line px-6 py-4 font-medium"
+              [class]="classeCabecalho(coluna)"
+            >
+              @if (ehDados(coluna) && coluna.ordenavel) {
                 <button
                   type="button"
                   (click)="alternarOrdenacao(coluna)"
@@ -58,9 +61,16 @@
                     class="h-3 w-3 shrink-0 transition-all"
                     [class.opacity-0]="sortColuna() !== coluna.chave"
                     [class.rotate-180]="sortColuna() === coluna.chave && sortDirecao() === 'desc'"
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2.5"
+                      d="M5 15l7-7 7 7"
+                    />
                   </svg>
                 </button>
               } @else {
@@ -68,60 +78,64 @@
               }
             </th>
           }
-          <th class="border-b border-line px-6 py-4 text-center font-medium" [class]="larguraAcao()">
-            {{ acaoTitulo() }}
-          </th>
         </tr>
       </thead>
       <tbody class="divide-y divide-line text-[14px] text-ink">
         @for (linha of linhasVisiveis(); track linha.codigo) {
           <tr class="h-[72px] transition-colors hover:bg-paper-soft/50">
             @for (coluna of colunas(); track coluna.chave) {
-              @switch (coluna.formato ?? 'texto') {
-                @case ('mono') {
-                  <td class="px-6 py-2 font-mono text-ink-soft">{{ valorTexto(linha, coluna) }}</td>
-                }
-                @case ('principal') {
-                  <td class="px-6 py-2 font-medium">
-                    <span class="line-clamp-2" [title]="valorTexto(linha, coluna)">{{
-                      valorTexto(linha, coluna)
-                    }}</span>
-                  </td>
-                }
-                @case ('moeda') {
-                  <td class="px-6 py-2" [class]="classeAlinhamento(coluna)">
-                    {{ valorMoeda(linha, coluna) | currency: 'BRL' }}
-                  </td>
-                }
+              @if (ehDados(coluna)) {
+                @switch (coluna.formato ?? 'texto') {
+                  @case ('mono') {
+                    <td class="px-6 py-2 font-mono text-ink-soft">
+                      {{ valorTexto(linha, coluna) }}
+                    </td>
+                  }
+                  @case ('principal') {
+                    <td class="px-6 py-2 font-medium">
+                      <span class="line-clamp-2" [title]="valorTexto(linha, coluna)">{{
+                        valorTexto(linha, coluna)
+                      }}</span>
+                    </td>
+                  }
+                  @case ('moeda') {
+                    <td class="px-6 py-2" [class]="classeAlinhamento(coluna)">
+                      {{ valorMoeda(linha, coluna) | currency: 'BRL' }}
+                    </td>
+                  }
 
-                @case ('template') {
-                  <td class="px-6 py-2" [class]="classeAlinhamento(coluna)">
-                    <!-- Aqui o filho pega o molde do pai e carimba, injetando a 'linha' atual -->
-                    <ng-container
-                      [ngTemplateOutlet]="templatePara(coluna.chave)"
-                      [ngTemplateOutletContext]="{ $implicit: linha }"
-                    />
-                  </td>
-                }
+                  @case ('template') {
+                    <td class="px-6 py-2" [class]="classeAlinhamento(coluna)">
+                      <!-- Aqui o filho pega o molde do pai e carimba, injetando a 'linha' atual -->
+                      <ng-container
+                        [ngTemplateOutlet]="templatePara(coluna.chave)"
+                        [ngTemplateOutletContext]="{ $implicit: linha }"
+                      />
+                    </td>
+                  }
 
-                @default {
-                  <td class="px-6 py-2" [class]="classeAlinhamento(coluna)">
-                    {{ valorTexto(linha, coluna) }}
-                  </td>
+                  @default {
+                    <td class="px-6 py-2" [class]="classeAlinhamento(coluna)">
+                      {{ valorTexto(linha, coluna) }}
+                    </td>
+                  }
                 }
+              } @else {
+                <td class="px-6 py-2 text-center">
+                  <ng-container
+                    [ngTemplateOutlet]="templatePara(coluna.chave)"
+                    [ngTemplateOutletContext]="{ $implicit: linha }"
+                  />
+                </td>
               }
             }
-            <td class="px-6 py-2 text-center">
-              <ng-container
-                [ngTemplateOutlet]="templatePara('acao')"
-                [ngTemplateOutletContext]="{ $implicit: linha }"
-              />
-            </td>
           </tr>
         } @empty {
           <tr>
-            <td [attr.colspan]="colunas().length + 1"
-                class="px-6 py-16 text-center text-[14px] text-ink-soft">
+            <td
+              [attr.colspan]="colunas().length"
+              class="px-6 py-16 text-center text-[14px] text-ink-soft"
+            >
               Nenhum registro encontrado.
             </td>
           </tr>
@@ -131,18 +145,20 @@
   </div>
 
   @if (paginavel()) {
-    <div class="flex flex-col items-center justify-between gap-4 border-t border-line bg-paper-soft px-6 py-4 sm:flex-row">
-    <span class="text-[13px] text-ink-soft">
-      Mostrando
-      <span class="font-medium text-ink">{{
+    <div
+      class="flex flex-col items-center justify-between gap-4 border-t border-line bg-paper-soft px-6 py-4 sm:flex-row"
+    >
+      <span class="text-[13px] text-ink-soft">
+        Mostrando
+        <span class="font-medium text-ink">{{
           linhasFiltradas().length > 0 ? (pagina() - 1) * itensPorPagina() + 1 : 0
         }}</span>
-      a
-      <span class="font-medium text-ink">{{
+        a
+        <span class="font-medium text-ink">{{
           mathMin(pagina() * itensPorPagina(), linhasFiltradas().length)
         }}</span>
-      de <span class="font-medium text-ink">{{ linhasFiltradas().length }}</span> registros
-    </span>
+        de <span class="font-medium text-ink">{{ linhasFiltradas().length }}</span> registros
+      </span>
 
       <div class="flex items-center gap-2">
         <button
@@ -153,7 +169,9 @@
           Anterior
         </button>
 
-        <span class="px-2 text-[13px] text-ink-soft">Pág. {{ pagina() }} de {{ totalDePaginas() }}</span>
+        <span class="px-2 text-[13px] text-ink-soft"
+          >Pág. {{ pagina() }} de {{ totalDePaginas() }}</span
+        >
 
         <button
           (click)="mudarPagina(1)"
@@ -165,5 +183,4 @@
       </div>
     </div>
   }
-
 </div>

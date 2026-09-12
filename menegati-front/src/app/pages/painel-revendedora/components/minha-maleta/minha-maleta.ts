@@ -14,7 +14,7 @@ const BADGE_CLASSES: Record<StatusItemLote, string> = {
   ENCARREGADO: 'bg-brand-light text-brand',
   MARC_VENDIDO_REV: 'bg-amber-100 text-amber-800',
   ACERTADO_VENDIDO: 'bg-emerald-100 text-emerald-800',
-  DEVOLVIDO: 'bg-paper-soft text-ink-soft'
+  DEVOLVIDO: 'bg-paper-soft text-ink-soft',
 };
 
 @Component({
@@ -30,11 +30,12 @@ export class MinhaMaleta {
   readonly onDesmarcarVendido = output<string>();
 
   protected readonly colunas: ColunaTabela<ItemConsignado>[] = [
-    { chave: 'codigo', titulo: 'Código', formato: 'mono', ordenavel: true },
-    { chave: 'produto', titulo: 'Produto', formato: 'principal', ordenavel: true },
-    { chave: 'quantidade', titulo: 'QTD.', formato: 'numero', ordenavel: true },
-    { chave: 'valorUnitarioCongelado', titulo: 'Valor', formato: 'moeda', ordenavel: true },
-    { chave: 'status', titulo: 'Status', formato: 'template', ordenavel: true },
+    { chave: 'codigo', titulo: 'Código', formato: 'mono', ordenavel: true, tipo: 'dados' },
+    { chave: 'produto', titulo: 'Produto', formato: 'principal', ordenavel: true, tipo: 'dados' },
+    { chave: 'quantidade', titulo: 'QTD.', formato: 'numero', ordenavel: true, tipo: 'dados' },
+    { chave: 'valorUnitarioCongelado', titulo: 'Valor', formato: 'moeda', ordenavel: true,tipo: 'dados' },
+    { chave: 'status', titulo: 'Status', formato: 'template', ordenavel: true, tipo: 'dados' },
+    { chave: 'acao', titulo: 'Ação', tipo: 'livre' },
   ];
 
   protected busca = signal('');
@@ -91,5 +92,4 @@ export class MinhaMaleta {
   protected statusRotulo(status: StatusItemLote): string {
     return STATUS_ITEM_LABEL[status];
   }
-
 }

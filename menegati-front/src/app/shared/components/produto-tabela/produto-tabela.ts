@@ -12,7 +12,7 @@ import {
 import {
   type ColunaTabela,
   type AlinhamentoColuna,
-  PADRAO_FORMATO
+  PADRAO_FORMATO_DADOS, ColunaDados, PADRAO_LIVRE
 } from './produto-tabela.tipos';
 import { CurrencyPipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -68,8 +68,12 @@ export class ProdutoTabela<T extends { codigo: string }> {
     });
   }
 
+  private readonly colunaDados = computed(()=>{
+    return this.colunas().filter((c): c is ColunaDados<T> => this.ehDados(c));
+  })
+
   private readonly camposBusca = computed(() =>
-    this.colunas()
+    this.colunaDados()
       .filter((c) => c.buscavel ?? this.padraoColuna(c).buscavel)
       .map((c) => c.chave),
   );
@@ -129,7 +133,7 @@ export class ProdutoTabela<T extends { codigo: string }> {
     if (novaPagina >= 1 && novaPagina <= this.totalDePaginas()) this.paginaAtual.set(novaPagina);
   }
 
-  protected alternarOrdenacao(coluna: ColunaTabela<T>): void {
+  protected alternarOrdenacao(coluna: ColunaDados<T>): void {
     if (!coluna.ordenavel) return;
 
     if (this.sortColuna() === coluna.chave) {
@@ -141,31 +145,40 @@ export class ProdutoTabela<T extends { codigo: string }> {
     this.paginaAtual.set(1);
   }
 
-  protected valorTexto(linha: T, coluna: ColunaTabela<T>): string {
+  protected valorTexto(linha: T, coluna: ColunaDados<T>): string {
     const v = linha[coluna.chave];
     return v == null ? '' : String(v);
   }
 
-  protected valorMoeda(linha: T, coluna: ColunaTabela<T>): number | null {
+  protected valorMoeda(linha: T, coluna: ColunaDados<T>): number | null {
     const v = linha[coluna.chave];
     return typeof v === 'number' ? v : null;
   }
 
   protected classeCabecalho(coluna: ColunaTabela<T>): string {
-    const p = this.padraoColuna(coluna);
-    return `${CLASSE_TEXTO[p.alinhamento]} ${coluna.largura ?? p.largura}`.trim();
+    if(coluna.tipo === 'dados'){
+      const p = this.padraoColuna(coluna);
+      return `${CLASSE_TEXTO[p.alinhamento]} ${coluna.largura ?? p.largura}`.trim();
+    }
+    return `${CLASSE_TEXTO[PADRAO_LIVRE.alinhamento]} ${coluna.largura ?? PADRAO_LIVRE.largura}`;
+
   }
 
-  protected classeAlinhamento(coluna: ColunaTabela<T>): string {
+  protected classeAlinhamento(coluna: ColunaDados<T>): string {
     return CLASSE_TEXTO[this.padraoColuna(coluna).alinhamento];
   }
 
-  protected classeBotao(coluna: ColunaTabela<T>): string {
+  protected classeBotao(coluna: ColunaDados<T>): string {
     return CLASSE_BOTAO[this.padraoColuna(coluna).alinhamento];
   }
 
-  private padraoColuna(coluna: ColunaTabela<T>) {
-    return PADRAO_FORMATO[coluna.formato ?? 'texto'];
+  private padraoColuna(coluna: ColunaDados<T>) {
+    return PADRAO_FORMATO_DADOS[coluna.formato ?? 'texto'];
+
+  }
+
+  protected ehDados(coluna: ColunaTabela<T>): coluna is ColunaDados<T>{
+    return coluna.tipo === 'dados';
   }
 
   protected templatePara(chave: string): CelulaTabela['template'] | null {
