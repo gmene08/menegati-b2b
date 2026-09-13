@@ -13,7 +13,7 @@ export interface ColunaDados<T> {
   ordenavel?: boolean;
 }
 
-export interface ColunaLivre{
+export interface ColunaLivre {
   chave: string;
   titulo: string;
   tipo: 'livre';
@@ -21,7 +21,37 @@ export interface ColunaLivre{
   largura?: string;
 }
 
+export type ChavesNumericas<T> = {
+  [K in keyof T]: T[K] extends number ? K : never;
+}[keyof T] &
+  string;
+
+export interface FiltroMax<T> {
+  chave: ChavesNumericas<T>;
+  rotulo: string;
+  tipo: 'max';
+  placeholder?: string;
+}
+
+export interface FiltroSelect<T> {
+  chave: keyof T & string;
+  rotulo: string;
+  tipo: 'select';
+  placeholder?: string;
+  opcoes: { valor: string; rotulo: string }[];
+}
+
+export interface FiltroIgual<T> {
+  chave: ChavesNumericas<T>;
+  rotulo: string;
+  tipo: 'igual';
+  placeholder?: string;
+}
+
+export type FiltroTabela<T> = FiltroMax<T> | FiltroSelect<T> | FiltroIgual<T>;
 export type ColunaTabela<T> = ColunaDados<T> | ColunaLivre;
+
+
 
 export const PADRAO_FORMATO_DADOS: Record<
   FormatoColuna,

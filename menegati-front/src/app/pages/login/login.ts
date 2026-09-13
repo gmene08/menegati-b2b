@@ -12,7 +12,7 @@ import { Role } from '../../core/models/role';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, LoginImg, LoginForm, RecuperarSenhaForm, VoltarButton, ConviteRevendedora],
+  imports: [ LoginImg, LoginForm, RecuperarSenhaForm, VoltarButton, ConviteRevendedora],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })

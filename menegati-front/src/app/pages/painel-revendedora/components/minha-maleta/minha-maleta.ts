@@ -1,12 +1,14 @@
-import { Component, computed, input, output, signal } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { Component, input, output } from '@angular/core';
 import {
   STATUS_ITEM_LABEL,
   type ItemConsignado,
   type StatusItemLote,
 } from '../../../../core/models/painel-revendedora-data';
 import { FormsModule } from '@angular/forms';
-import { ColunaTabela } from '../../../../shared/components/produto-tabela/produto-tabela.tipos';
+import {
+  ColunaTabela,
+  FiltroTabela,
+} from '../../../../shared/components/produto-tabela/produto-tabela.tipos';
 import { ProdutoTabela } from '../../../../shared/components/produto-tabela/produto-tabela';
 import { CelulaTabela } from '../../../../shared/components/produto-tabela/celula-tabela';
 
@@ -29,53 +31,40 @@ export class MinhaMaleta {
   readonly onMarcarVendido = output<string>();
   readonly onDesmarcarVendido = output<string>();
 
+  private readonly statusDesejadosNoFiltro: StatusItemLote[] = [
+    'ENCARREGADO',
+    'MARC_VENDIDO_REV',
+    'ACERTADO_VENDIDO',
+  ];
+
   protected readonly colunas: ColunaTabela<ItemConsignado>[] = [
     { chave: 'codigo', titulo: 'Código', formato: 'mono', ordenavel: true, tipo: 'dados' },
     { chave: 'produto', titulo: 'Produto', formato: 'principal', ordenavel: true, tipo: 'dados' },
     { chave: 'quantidade', titulo: 'QTD.', formato: 'numero', ordenavel: true, tipo: 'dados' },
-    { chave: 'valorUnitarioCongelado', titulo: 'Valor', formato: 'moeda', ordenavel: true,tipo: 'dados' },
+    {
+      chave: 'valorUnitarioCongelado',
+      titulo: 'Valor',
+      formato: 'moeda',
+      ordenavel: true,
+      tipo: 'dados',
+    },
     { chave: 'status', titulo: 'Status', formato: 'template', ordenavel: true, tipo: 'dados' },
     { chave: 'acao', titulo: 'Ação', tipo: 'livre' },
   ];
 
-  protected busca = signal('');
-  protected filtroStatus = signal<StatusItemLote | 'TODOS'>('TODOS');
-  protected filtroPrecoMax = signal<number | null>(null);
-  protected filtroQtd = signal<number | null>(null);
-
-  protected readonly itensFiltrados = computed(() => {
-    let resultado = this.itens();
-    const status = this.filtroStatus();
-    const precoMax = this.filtroPrecoMax();
-    const qtd = this.filtroQtd();
-
-    if (status !== 'TODOS') {
-      resultado = resultado.filter((item) => item.status === status);
-    }
-    if (precoMax !== null && precoMax > 0) {
-      resultado = resultado.filter((item) => item.valorUnitarioCongelado <= precoMax);
-    }
-    if (qtd !== null && qtd > 0) {
-      resultado = resultado.filter((item) => item.quantidade === qtd);
-    }
-
-    return resultado;
-  });
-
-  protected readonly temFiltrosAtivos = computed(
-    () =>
-      this.busca().trim() !== '' ||
-      this.filtroStatus() !== 'TODOS' ||
-      this.filtroPrecoMax() !== null ||
-      this.filtroQtd() !== null,
-  );
-
-  protected limparFiltros(): void {
-    this.busca.set('');
-    this.filtroStatus.set('TODOS');
-    this.filtroPrecoMax.set(null);
-    this.filtroQtd.set(null);
-  }
+  protected readonly filtros: FiltroTabela<ItemConsignado>[] = [
+    {
+      tipo: 'select',
+      chave: 'status',
+      rotulo: 'Todos os status',
+      opcoes: this.statusDesejadosNoFiltro.map(status=> ({
+        valor: status,
+        rotulo: STATUS_ITEM_LABEL[status],
+      })),
+    },
+    { tipo: 'max', chave: 'valorUnitarioCongelado', rotulo: 'Até R$', placeholder: 'Máx.' },
+    { tipo: 'igual', chave: 'quantidade', rotulo: 'Qtd.', placeholder: 'Ex: 2' },
+  ];
 
   protected marcarComoVendido(codigo: string): void {
     this.onMarcarVendido.emit(codigo);

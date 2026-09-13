@@ -1,66 +1,24 @@
 <div class="mb-8">
   <h2 class="font-brand text-3xl text-ink">A Minha Maleta</h2>
   <p class="mt-1 text-[14px] text-ink-soft">
-    Marque as peças que já vendeu. Isto é só uma organização visual — o acerto final continua
-    sendo feito pessoalmente com a loja.
+    Marque as peças que já vendeu. Isto é só uma organização visual — o acerto final continua sendo
+    feito pessoalmente com a loja.
   </p>
 </div>
 
 <app-produto-tabela
-  [linhas]="itensFiltrados()"
+  [linhas]="itens()"
   [colunas]="colunas"
-  [(busca)]="busca"
+  [filtros]="filtros"
   titulo="Itens Consignados"
 >
-  <select
-    filtros
-    [ngModel]="filtroStatus()"
-    (ngModelChange)="filtroStatus.set($event)"
-    class="h-9 rounded-sm border border-line bg-white px-2.5 text-[13px] text-ink focus:border-brand focus:outline-none"
-  >
-    <option value="TODOS">Todos os status</option>
-    <option value="ENCARREGADO">Na maleta (a vender)</option>
-    <option value="MARC_VENDIDO_REV">Vendidos (a confirmar)</option>
-    <option value="ACERTADO_VENDIDO">Já acertados</option>
-  </select>
-
-  <div filtros class="flex h-9 items-center gap-1.5 rounded-sm border border-line bg-white px-2.5 focus-within:border-brand">
-    <span class="text-[13px] whitespace-nowrap text-ink-soft">Até R$</span>
-    <input
-      type="number" placeholder="Máx."
-      [ngModel]="filtroPrecoMax()" (ngModelChange)="filtroPrecoMax.set($event)"
-      class="w-14 border-none bg-transparent p-0 text-[13px] text-ink outline-none"
-    />
-  </div>
-
-  <div filtros class="flex h-9 items-center gap-1.5 rounded-sm border border-line bg-white px-2.5 focus-within:border-brand">
-    <span class="text-[13px] whitespace-nowrap text-ink-soft">Qtd.</span>
-    <input
-      type="number" placeholder="Ex: 2"
-      [ngModel]="filtroQtd()" (ngModelChange)="filtroQtd.set($event)"
-      class="w-10 border-none bg-transparent p-0 text-[13px] text-ink outline-none"
-    />
-  </div>
-
-  @if (temFiltrosAtivos()) {
-    <button
-      filtros
-      type="button"
-      (click)="limparFiltros()"
-      class="h-9 rounded-sm px-2 text-[12.5px] font-medium text-ink-soft underline-offset-2 transition-colors hover:text-brand hover:underline"
-    >
-      Limpar filtros
-    </button>
-
-  }
-
   <ng-template appCelula="status" let-item>
-  <span
-    class="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold tracking-wide"
-    [class]="badgeClasse(item.status)"
-  >
-    {{ statusRotulo(item.status) }}
-  </span>
+    <span
+      class="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold tracking-wide"
+      [class]="badgeClasse(item.status)"
+    >
+      {{ statusRotulo(item.status) }}
+    </span>
   </ng-template>
 
   <ng-template appCelula="acao" let-item>
@@ -79,7 +37,12 @@
         class="flex w-full items-center justify-center gap-1 rounded-sm border border-line bg-paper-soft px-3 py-1.5 text-[12px] font-medium text-ink-soft transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
       >
         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
         Desmarcar
       </button>
@@ -88,4 +51,3 @@
     }
   </ng-template>
 </app-produto-tabela>
-

@@ -12,7 +12,7 @@ import {
 import {
   type ColunaTabela,
   type AlinhamentoColuna,
-  PADRAO_FORMATO_DADOS, ColunaDados, PADRAO_LIVRE
+  PADRAO_FORMATO_DADOS, ColunaDados, PADRAO_LIVRE, FiltroTabela
 } from './produto-tabela.tipos';
 import { CurrencyPipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -40,16 +40,17 @@ const CLASSE_BOTAO: Record<AlinhamentoColuna, string> = {
 export class ProdutoTabela<T extends { codigo: string }> {
   protected readonly mathMin = Math.min;
 
+  readonly titulo = input<string>('');
+
   readonly linhas = input.required<T[]>();
   readonly colunas = input.required<ColunaTabela<T>[]>();
 
-  readonly acaoTitulo = input('Ação');
-  readonly larguraAcao = input('w-44');
+  readonly filtros = input<FiltroTabela<T>[]>([]);
+  protected readonly valoresFiltros = signal<Record<string, string | number | null>>({});
 
   readonly busca = model('');
   readonly buscavel = input<boolean>(true);
   readonly buscaPlaceholder = input('Buscar...');
-  readonly titulo = input<string>('');
 
   protected readonly sortColuna = signal<(keyof T & string) | null>(null);
   protected readonly sortDirecao = signal<'asc' | 'desc'>('asc');
@@ -68,9 +69,15 @@ export class ProdutoTabela<T extends { codigo: string }> {
     });
   }
 
-  private readonly colunaDados = computed(()=>{
+  private readonly colunaDados = computed(() => {
     return this.colunas().filter((c): c is ColunaDados<T> => this.ehDados(c));
-  })
+  });
+
+  protected readonly temFiltrosAtivos = computed(
+    () =>
+      this.busca().trim() !== '' ||
+      Object.values(this.valoresFiltros()).some((v) => v != null && v !== ''),
+  );
 
   private readonly camposBusca = computed(() =>
     this.colunaDados()
@@ -79,11 +86,31 @@ export class ProdutoTabela<T extends { codigo: string }> {
   );
 
   protected readonly linhasFiltradas = computed(() => {
+    const valores = this.valoresFiltros();
+    let resultado = this.linhas();
+
+    for (const filtro of this.filtros()) {
+      const valor = valores[filtro.chave];
+      if (valor == null || valor === '') continue;
+
+      switch (filtro.tipo) {
+        case 'select':
+          resultado = resultado.filter((l) => String(valor) === String(l[filtro.chave]));
+          break;
+        case 'max':
+          resultado = resultado.filter((l) => Number(valor) >= Number(l[filtro.chave]));
+          break;
+        case 'igual':
+          resultado = resultado.filter((l) => Number(valor) === Number(l[filtro.chave]));
+          break;
+      }
+    }
+
     const termo = this.busca().trim().toLowerCase();
-    if (!termo || !this.buscavel()) return this.linhas();
+    if (!termo || !this.buscavel()) return resultado;
 
     const campos = this.camposBusca();
-    return this.linhas().filter((l) =>
+    return resultado.filter((l) =>
       campos.some((c) =>
         String(l[c] ?? '')
           .toLowerCase()
@@ -145,6 +172,17 @@ export class ProdutoTabela<T extends { codigo: string }> {
     this.paginaAtual.set(1);
   }
 
+  protected definirFiltro(chave: string, valor: string | number | null): void {
+    this.valoresFiltros.update((v) => ({ ...v, [chave]: valor }));
+    this.paginaAtual.set(1);
+  }
+
+  protected limparFiltros(): void {
+    this.valoresFiltros.set({});
+    this.busca.set('');
+    this.paginaAtual.set(1);
+  }
+
   protected valorTexto(linha: T, coluna: ColunaDados<T>): string {
     const v = linha[coluna.chave];
     return v == null ? '' : String(v);
@@ -156,12 +194,11 @@ export class ProdutoTabela<T extends { codigo: string }> {
   }
 
   protected classeCabecalho(coluna: ColunaTabela<T>): string {
-    if(coluna.tipo === 'dados'){
+    if (coluna.tipo === 'dados') {
       const p = this.padraoColuna(coluna);
       return `${CLASSE_TEXTO[p.alinhamento]} ${coluna.largura ?? p.largura}`.trim();
     }
     return `${CLASSE_TEXTO[PADRAO_LIVRE.alinhamento]} ${coluna.largura ?? PADRAO_LIVRE.largura}`;
-
   }
 
   protected classeAlinhamento(coluna: ColunaDados<T>): string {
@@ -174,10 +211,9 @@ export class ProdutoTabela<T extends { codigo: string }> {
 
   private padraoColuna(coluna: ColunaDados<T>) {
     return PADRAO_FORMATO_DADOS[coluna.formato ?? 'texto'];
-
   }
 
-  protected ehDados(coluna: ColunaTabela<T>): coluna is ColunaDados<T>{
+  protected ehDados(coluna: ColunaTabela<T>): coluna is ColunaDados<T> {
     return coluna.tipo === 'dados';
   }
 

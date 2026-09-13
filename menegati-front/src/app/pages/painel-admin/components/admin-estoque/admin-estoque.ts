@@ -4,10 +4,17 @@ import { FormsModule } from '@angular/forms';
 import type { ProdutoEstoque } from '../../../../core/models/admin-data';
 import { AjustarQuantidadeModal, type AjustarQuantidadePayload } from './components/ajustar-quantidade-modal/ajustar-quantidade-modal';
 import { NovoProdutoModal } from './components/novo-produto-modal/novo-produto-modal';
+import { ProdutoTabela } from '../../../../shared/components/produto-tabela/produto-tabela';
+import { ColunaTabela, FiltroTabela } from '../../../../shared/components/produto-tabela/produto-tabela.tipos';
 
 @Component({
   selector: 'app-admin-estoque',
-  imports: [CurrencyPipe, FormsModule, AjustarQuantidadeModal, NovoProdutoModal],
+  imports: [
+    FormsModule,
+    AjustarQuantidadeModal,
+    NovoProdutoModal,
+    ProdutoTabela,
+  ],
   templateUrl: './admin-estoque.html',
   styleUrl: './admin-estoque.css',
 })
@@ -24,13 +31,23 @@ export class AdminEstoque {
   protected readonly modalNovoProdutoAberto = signal(false);
   protected readonly painelCsvAberto = signal(false);
 
-  protected readonly produtosFiltrados = computed(() => {
-    const termo = this.busca().trim().toLowerCase();
-    if (!termo) return this.produtos();
-    return this.produtos().filter(
-      (p) => p.codigo.toLowerCase().includes(termo) || p.nome.toLowerCase().includes(termo),
-    );
-  });
+  protected readonly colunas: ColunaTabela<ProdutoEstoque>[] = [
+    { chave: 'codigo', titulo: 'Código', formato: 'mono', ordenavel: true, tipo: 'dados' },
+    { chave: 'nome', titulo: 'Produto', formato: 'principal', ordenavel: true, tipo: 'dados' },
+    {
+      chave: 'quantidadeDisponivel',
+      titulo: 'QTD.',
+      formato: 'numero',
+      ordenavel: true,
+      tipo: 'dados',
+    },
+    { chave: 'precoVenda', titulo: 'Valor', formato: 'moeda', ordenavel: true, tipo: 'dados' },
+  ];
+
+  protected readonly filtrosTabela: FiltroTabela<ProdutoEstoque>[] = [
+    { tipo: 'max', chave: 'precoVenda', rotulo: 'Até R$', placeholder: 'Máx.' },
+    { tipo: 'igual', chave: 'quantidadeDisponivel', rotulo: 'Qtd.', placeholder: 'Ex: 2' },
+  ];
 
   protected readonly totalItens = computed(() =>
     this.produtos().reduce((soma, p) => soma + p.quantidadeDisponivel, 0),
