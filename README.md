@@ -340,7 +340,7 @@ MenegatiJoias/
         │   ├── painel-revendedora/                                # minha maleta, histórico
         │   └── painel-admin/                                      # dashboard, revendedoras,
         │                                                          # estoque, maletas (upload)
-        └── shared/components/   # ProdutoTabela (tabela genérica tipada), ErrorMessage
+        └── shared/components/   # Tabela (tabela genérica tipada), ErrorMessage
 ```
 
 ---

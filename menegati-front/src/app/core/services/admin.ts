@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
-import { PainelAdminData } from '../models/admin-data';
+import { DetalheRevendedoraData, PainelAdminData } from '../models/admin-data';
 
 @Injectable({
   providedIn: 'root',
@@ -17,5 +17,9 @@ export class AdminService {
     return this.http
       .get<PainelAdminData>(`${this.apiUrl}`)
       .pipe(tap((data) => this.adminData.set(data)));
+  }
+
+  getDetalheRevendedora(id: number) {
+    return this.http.get<DetalheRevendedoraData>(`${this.apiUrl}/revendedora/${id}`);
   }
 }

@@ -22,7 +22,8 @@ public class PainelRevendedoraResponseDTO {
                                 BigDecimal metaMensal,
                                 BigDecimal valorDevidoAtual) {}
 
-    public record ItemDTO(String codigo,
+    public record ItemDTO(Long id,
+                          String codigo,
                           String produto,
                           StatusItemLote status,
                           BigDecimal valorUnitarioCongelado,

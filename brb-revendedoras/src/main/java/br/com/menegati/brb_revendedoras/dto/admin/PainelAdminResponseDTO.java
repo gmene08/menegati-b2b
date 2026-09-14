@@ -1,6 +1,7 @@
 package br.com.menegati.brb_revendedoras.dto.admin;
 
 import br.com.menegati.brb_revendedoras.enums.OrigemProcessamento;
+import br.com.menegati.brb_revendedoras.enums.StatusDividaRevendedora;
 import br.com.menegati.brb_revendedoras.enums.StatusLote;
 import br.com.menegati.brb_revendedoras.enums.TipoProcessamento;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class PainelAdminResponseDTO {
     public record AdminRevendedoraDTO(Long id, String nome, String cpf, String telefone,
                                       BigDecimal saldoDevedor, BigDecimal saldoBonus,
                                       BigDecimal exposicaoMaleta, int diasAtraso,
+                                      StatusDividaRevendedora status,
                                       LocalDate dataUltimoAcerto, StatusLote loteStatus) {}
 
     public record ProdutoDTO(String codigo,

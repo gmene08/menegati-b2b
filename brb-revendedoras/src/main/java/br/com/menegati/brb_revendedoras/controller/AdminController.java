@@ -1,5 +1,6 @@
 package br.com.menegati.brb_revendedoras.controller;
 
+import br.com.menegati.brb_revendedoras.dto.admin.DetalheRevendedoraResponseDTO;
 import br.com.menegati.brb_revendedoras.dto.admin.PainelAdminResponseDTO;
 import br.com.menegati.brb_revendedoras.dto.auth.RegisterRequestDTO;
 import br.com.menegati.brb_revendedoras.dto.revendedora.ExtratoResponseDTO;
@@ -154,6 +155,12 @@ public class AdminController {
                 pagamentoRequest.observacao
         );
 
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @GetMapping("/revendedora/{id}")
+    public ResponseEntity<DetalheRevendedoraResponseDTO> getDetalheRevendedora(@PathVariable Long id){
+        DetalheRevendedoraResponseDTO responseDTO = painelAdminService.getDetalheRevendedora(id);
         return ResponseEntity.ok(responseDTO);
     }
 

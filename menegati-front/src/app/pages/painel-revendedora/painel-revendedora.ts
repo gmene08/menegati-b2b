@@ -48,11 +48,11 @@ export class PainelRevendedora implements OnInit {
     this.abaAtiva.set(id);
   }
 
-  protected marcarComoVendido(codigo: string): void {
+  protected marcarComoVendido(id: number): void {
 
   }
 
-  protected desmarcarVendido(codigo: string): void {
+  protected desmarcarVendido(id: number): void {
 
   }
 

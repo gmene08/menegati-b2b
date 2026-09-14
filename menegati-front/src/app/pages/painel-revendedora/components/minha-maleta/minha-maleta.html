@@ -6,7 +6,8 @@
   </p>
 </div>
 
-<app-produto-tabela
+<app-tabela
+  chaveLinha="id"
   [linhas]="itens()"
   [colunas]="colunas"
   [filtros]="filtros"
@@ -25,7 +26,7 @@
     @if (item.status === 'ENCARREGADO') {
       <button
         type="button"
-        (click)="marcarComoVendido(item.codigo)"
+        (click)="marcarComoVendido(item.id)"
         class="w-full rounded-sm border border-brand px-3 py-1.5 text-[12px] font-medium text-brand transition-colors hover:bg-brand hover:text-white"
       >
         Marcar Venda
@@ -33,7 +34,7 @@
     } @else if (item.status === 'MARC_VENDIDO_REV') {
       <button
         type="button"
-        (click)="desmarcarComoVendido(item.codigo)"
+        (click)="desmarcarComoVendido(item.id)"
         class="flex w-full items-center justify-center gap-1 rounded-sm border border-line bg-paper-soft px-3 py-1.5 text-[12px] font-medium text-ink-soft transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
       >
         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,4 +51,4 @@
       <span class="text-[12px] text-ink-soft">—</span>
     }
   </ng-template>
-</app-produto-tabela>
+</app-tabela>

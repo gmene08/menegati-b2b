@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import type { ProdutoEstoque } from '../../../../core/models/admin-data';
 import { AjustarQuantidadeModal, type AjustarQuantidadePayload } from './components/ajustar-quantidade-modal/ajustar-quantidade-modal';
 import { NovoProdutoModal } from './components/novo-produto-modal/novo-produto-modal';
-import { ProdutoTabela } from '../../../../shared/components/produto-tabela/produto-tabela';
-import { ColunaTabela, FiltroTabela } from '../../../../shared/components/produto-tabela/produto-tabela.tipos';
+import { Tabela } from '../../../../shared/components/tabela/tabela';
+import { ColunaTabela, FiltroTabela } from '../../../../shared/components/tabela/tabela.tipos';
 
 @Component({
   selector: 'app-admin-estoque',
@@ -13,7 +13,7 @@ import { ColunaTabela, FiltroTabela } from '../../../../shared/components/produt
     FormsModule,
     AjustarQuantidadeModal,
     NovoProdutoModal,
-    ProdutoTabela,
+    Tabela,
   ],
   templateUrl: './admin-estoque.html',
   styleUrl: './admin-estoque.css',

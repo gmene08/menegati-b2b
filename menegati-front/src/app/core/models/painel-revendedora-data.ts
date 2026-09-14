@@ -16,6 +16,7 @@ export const TIPO_DOCUMENTO_LABEL: Record<TipoDocumentoMaleta, string> = {
 };
 
 export interface ItemConsignado {
+  id: number;
   codigo: string;
   produto: string;
   quantidade: number;

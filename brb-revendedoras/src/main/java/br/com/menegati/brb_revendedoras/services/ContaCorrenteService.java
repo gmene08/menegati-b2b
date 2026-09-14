@@ -81,6 +81,10 @@ public class ContaCorrenteService {
         return lancamentoFinanceiroRepository.findByRevendedorIdOrderByDataAsc(revendedorId);
     }
 
+    public List<LancamentoFinanceiro> getHistoricoFinanceiro(Long revendedorId, CarteiraLancamento carteira) {
+        return lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(revendedorId, carteira);
+    }
+
 
     public ExtratoResponseDTO getExtrato(Long id) {
         List<LancamentoFinanceiro> lancamentos = lancamentoFinanceiroRepository.findByRevendedorIdAndCarteiraOrderByDataAsc(id, CarteiraLancamento.DINHEIRO);

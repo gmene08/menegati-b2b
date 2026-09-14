@@ -333,6 +333,10 @@ public class LoteService {
         return documentoMaletaRepository.save(documentoMaleta);
     }
 
+    public Optional<LoteConsignacao> getLoteAberto(Long revendedorId){
+        return loteRepository.findByRevendedorIdAndStatus(revendedorId, StatusLote.ABERTO);
+    }
+
     public Map<Long, BigDecimal> getValorTotalEstimadoPorRevendedora(){
         return loteRepository.getValorTotalEstimadoPorRevendedor().stream().collect(
                 Collectors.toMap(

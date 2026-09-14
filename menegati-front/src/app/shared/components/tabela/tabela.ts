@@ -4,6 +4,7 @@ import {
   contentChildren,
   effect,
   input,
+  linkedSignal,
   model,
   signal,
   untracked,
@@ -12,8 +13,12 @@ import {
 import {
   type ColunaTabela,
   type AlinhamentoColuna,
-  PADRAO_FORMATO_DADOS, ColunaDados, PADRAO_LIVRE, FiltroTabela
-} from './produto-tabela.tipos';
+  type ColunaDados,
+  type FiltroTabela,
+  type OrdenacaoTabela,
+  PADRAO_FORMATO_DADOS,
+  PADRAO_LIVRE,
+} from './tabela.tipos';
 import { CurrencyPipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CelulaTabela } from './celula-tabela';
@@ -32,18 +37,20 @@ const CLASSE_BOTAO: Record<AlinhamentoColuna, string> = {
 };
 
 @Component({
-  selector: 'app-produto-tabela',
+  selector: 'app-tabela',
   imports: [CurrencyPipe, FormsModule, NgTemplateOutlet],
-  templateUrl: './produto-tabela.html',
-  styleUrl: './produto-tabela.css',
+  templateUrl: './tabela.html',
+  styleUrl: './tabela.css',
 })
-export class ProdutoTabela<T extends { codigo: string }> {
+export class Tabela<T extends object> {
   protected readonly mathMin = Math.min;
 
   readonly titulo = input<string>('');
 
   readonly linhas = input.required<T[]>();
   readonly colunas = input.required<ColunaTabela<T>[]>();
+  /** Campo que identifica a linha (track do @for). Ex.: 'codigo' no estoque, 'id' na maleta. */
+  readonly chaveLinha = input.required<keyof T & string>();
 
   readonly filtros = input<FiltroTabela<T>[]>([]);
   protected readonly valoresFiltros = signal<Record<string, string | number | null>>({});
@@ -52,8 +59,13 @@ export class ProdutoTabela<T extends { codigo: string }> {
   readonly buscavel = input<boolean>(true);
   readonly buscaPlaceholder = input('Buscar...');
 
-  protected readonly sortColuna = signal<(keyof T & string) | null>(null);
-  protected readonly sortDirecao = signal<'asc' | 'desc'>('asc');
+  readonly ordenacaoInicial = input<OrdenacaoTabela<T> | null>(null);
+  protected readonly sortColuna = linkedSignal<(keyof T & string) | null>(
+    () => this.ordenacaoInicial()?.chave ?? null,
+  );
+  protected readonly sortDirecao = linkedSignal<'asc' | 'desc'>(
+    () => this.ordenacaoInicial()?.direcao ?? 'asc',
+  );
 
   readonly paginavel = input(true);
   protected readonly paginaAtual = signal(1);
@@ -196,17 +208,21 @@ export class ProdutoTabela<T extends { codigo: string }> {
   protected classeCabecalho(coluna: ColunaTabela<T>): string {
     if (coluna.tipo === 'dados') {
       const p = this.padraoColuna(coluna);
-      return `${CLASSE_TEXTO[p.alinhamento]} ${coluna.largura ?? p.largura}`.trim();
+      return `${CLASSE_TEXTO[this.alinhamento(coluna)]} ${coluna.largura ?? p.largura}`.trim();
     }
     return `${CLASSE_TEXTO[PADRAO_LIVRE.alinhamento]} ${coluna.largura ?? PADRAO_LIVRE.largura}`;
   }
 
   protected classeAlinhamento(coluna: ColunaDados<T>): string {
-    return CLASSE_TEXTO[this.padraoColuna(coluna).alinhamento];
+    return CLASSE_TEXTO[this.alinhamento(coluna)];
   }
 
   protected classeBotao(coluna: ColunaDados<T>): string {
-    return CLASSE_BOTAO[this.padraoColuna(coluna).alinhamento];
+    return CLASSE_BOTAO[this.alinhamento(coluna)];
+  }
+
+  private alinhamento(coluna: ColunaDados<T>): AlinhamentoColuna {
+    return coluna.alinhamento ?? this.padraoColuna(coluna).alinhamento;
   }
 
   private padraoColuna(coluna: ColunaDados<T>) {

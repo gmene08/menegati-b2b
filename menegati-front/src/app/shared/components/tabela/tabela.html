@@ -91,28 +91,31 @@
                 <button
                   type="button"
                   (click)="alternarOrdenacao(coluna)"
-                  class="flex items-center gap-1 whitespace-nowrap uppercase tracking-wider transition-colors"
+                  class="flex items-center whitespace-nowrap uppercase tracking-wider transition-colors"
                   [class]="classeBotao(coluna)"
                   [class.text-brand]="sortColuna() === coluna.chave"
                   [class.font-bold]="sortColuna() === coluna.chave"
                   [class.hover:text-ink]="sortColuna() !== coluna.chave"
                 >
-                  {{ coluna.titulo }}
-                  <svg
-                    class="h-3 w-3 shrink-0 transition-all"
-                    [class.opacity-0]="sortColuna() !== coluna.chave"
-                    [class.rotate-180]="sortColuna() === coluna.chave && sortDirecao() === 'desc'"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2.5"
-                      d="M5 15l7-7 7 7"
-                    />
-                  </svg>
+                  <!-- Ícone absoluto: o título fica alinhado com a célula, com ou sem ordenação -->
+                  <span class="relative">
+                    {{ coluna.titulo }}
+                    <svg
+                      class="absolute top-1/2 left-full ml-1 h-3 w-3 -translate-y-1/2 transition-all"
+                      [class.opacity-0]="sortColuna() !== coluna.chave"
+                      [class.rotate-180]="sortColuna() === coluna.chave && sortDirecao() === 'desc'"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.5"
+                        d="M5 15l7-7 7 7"
+                      />
+                    </svg>
+                  </span>
                 </button>
               } @else {
                 {{ coluna.titulo }}
@@ -122,7 +125,7 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-line text-[14px] text-ink">
-        @for (linha of linhasVisiveis(); track linha.codigo) {
+        @for (linha of linhasVisiveis(); track linha[chaveLinha()]) {
           <tr class="h-[72px] transition-colors hover:bg-paper-soft/50">
             @for (coluna of colunas(); track coluna.chave) {
               @if (ehDados(coluna)) {

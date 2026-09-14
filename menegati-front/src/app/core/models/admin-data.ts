@@ -36,6 +36,7 @@ export interface RevendedoraResumo {
   saldoBonus: number;
   exposicaoMaleta: number;
   diasAtraso: number;
+  status: StatusRevendedora;
   dataUltimoAcerto: string | null;
   loteStatus: 'ABERTO' | 'FECHADO';
 }
@@ -47,10 +48,12 @@ export interface LancamentoFinanceiro {
   carteira: Carteira;
   valor: number;
   descricao: string;
+  observacao: string | null;
   saldoApos: number;
 }
 
 export interface AcertoAdmin {
+  id: number;
   documentoMaleta: string;
   dataAcerto: string;
   dataVencimento: string;
@@ -93,4 +96,10 @@ export interface PainelAdminData {
   revendedoras: RevendedoraResumo[];
   estoque: ProdutoEstoque[];
   processamentos: ProcessamentoLog[];
+}
+
+export interface DetalheRevendedoraData {
+  resumo: RevendedoraResumo;
+  lancamentos: LancamentoFinanceiro[];
+  acertos: AcertoAdmin[];
 }

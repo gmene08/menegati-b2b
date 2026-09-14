@@ -8,9 +8,9 @@ import { FormsModule } from '@angular/forms';
 import {
   ColunaTabela,
   FiltroTabela,
-} from '../../../../shared/components/produto-tabela/produto-tabela.tipos';
-import { ProdutoTabela } from '../../../../shared/components/produto-tabela/produto-tabela';
-import { CelulaTabela } from '../../../../shared/components/produto-tabela/celula-tabela';
+} from '../../../../shared/components/tabela/tabela.tipos';
+import { Tabela } from '../../../../shared/components/tabela/tabela';
+import { CelulaTabela } from '../../../../shared/components/tabela/celula-tabela';
 
 const BADGE_CLASSES: Record<StatusItemLote, string> = {
   ENCARREGADO: 'bg-brand-light text-brand',
@@ -21,15 +21,17 @@ const BADGE_CLASSES: Record<StatusItemLote, string> = {
 
 @Component({
   selector: 'app-minha-maleta',
-  imports: [FormsModule, ProdutoTabela, CelulaTabela],
+  imports: [FormsModule, Tabela, CelulaTabela],
   templateUrl: './minha-maleta.html',
   styleUrl: './minha-maleta.css',
 })
 export class MinhaMaleta {
   readonly itens = input.required<ItemConsignado[]>();
 
-  readonly onMarcarVendido = output<string>();
-  readonly onDesmarcarVendido = output<string>();
+  // Emitem o id do ItemLote, não o código do produto: após venda parcial dois itens
+  // do mesmo lote compartilham o código.
+  readonly onMarcarVendido = output<number>();
+  readonly onDesmarcarVendido = output<number>();
 
   private readonly statusDesejadosNoFiltro: StatusItemLote[] = [
     'ENCARREGADO',
@@ -66,12 +68,12 @@ export class MinhaMaleta {
     { tipo: 'igual', chave: 'quantidade', rotulo: 'Qtd.', placeholder: 'Ex: 2' },
   ];
 
-  protected marcarComoVendido(codigo: string): void {
-    this.onMarcarVendido.emit(codigo);
+  protected marcarComoVendido(id: number): void {
+    this.onMarcarVendido.emit(id);
   }
 
-  protected desmarcarComoVendido(codigo: string): void {
-    this.onDesmarcarVendido.emit(codigo);
+  protected desmarcarComoVendido(id: number): void {
+    this.onDesmarcarVendido.emit(id);
   }
 
   protected badgeClasse(status: StatusItemLote): string {

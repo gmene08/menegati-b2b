@@ -9,6 +9,7 @@ export interface ColunaDados<T> {
 
   formato?: FormatoColuna;
   largura?: string;
+  alinhamento?: AlinhamentoColuna;
   buscavel?: boolean;
   ordenavel?: boolean;
 }
@@ -50,6 +51,11 @@ export interface FiltroIgual<T> {
 
 export type FiltroTabela<T> = FiltroMax<T> | FiltroSelect<T> | FiltroIgual<T>;
 export type ColunaTabela<T> = ColunaDados<T> | ColunaLivre;
+
+export interface OrdenacaoTabela<T> {
+  chave: keyof T & string;
+  direcao: 'asc' | 'desc';
+}
 
 
 

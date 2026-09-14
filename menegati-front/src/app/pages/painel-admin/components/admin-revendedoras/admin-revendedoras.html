@@ -1,114 +1,92 @@
-@if (revendedoraSelecionada(); as r) {
-  <app-revendedora-detalhe
-    [revendedora]="r"
-    [lancamentos]="lancamentosSelecionados()"
-    [acertos]="acertosSelecionados()"
-    (onVoltar)="fecharDetalhe()"
-  ></app-revendedora-detalhe>
+@if (revendedoraSelecionadaId() !== null) {
+  @if (detalheCarregando()) {
+    <div class="flex items-center justify-center p-12 text-[14px] text-ink-soft">
+      Carregando revendedora...
+    </div>
+  } @else if (detalheErro()) {
+    <div class="flex flex-col items-center justify-center px-4 py-12 text-center">
+      <div
+        class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-500"
+      >
+        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+      </div>
+      <h3 class="mb-2 font-brand text-xl text-ink">Ops, algo correu mal</h3>
+      <p class="mb-6 max-w-md text-ink-soft">{{ detalheErro() }}</p>
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          (click)="fecharDetalhe()"
+          class="rounded-sm border border-line px-5 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-paper-soft"
+        >
+          Voltar
+        </button>
+        <button
+          type="button"
+          (click)="tentarNovamente()"
+          class="rounded-sm bg-brand px-6 py-2 text-[13px] font-medium text-white transition-colors hover:bg-brand-dark"
+        >
+          Tentar Novamente
+        </button>
+      </div>
+    </div>
+  } @else if (detalhe(); as d) {
+    <app-revendedora-detalhe
+      [revendedora]="d.resumo"
+      [lancamentos]="d.lancamentos"
+      [acertos]="d.acertos"
+      (onVoltar)="fecharDetalhe()"
+    ></app-revendedora-detalhe>
+  }
 } @else {
   <div class="mb-8">
     <h2 class="font-brand text-3xl text-ink">Revendedoras</h2>
-    <p class="mt-1 text-[14px] text-ink-soft">Lista completa, ordenada por maior dívida ou atraso</p>
+    <p class="mt-1 text-[14px] text-ink-soft">
+      Lista completa, ordenada por maior dívida ou atraso
+    </p>
   </div>
 
-  <div class="overflow-hidden rounded-sm border border-line bg-paper shadow-sm">
-    <div class="flex flex-wrap items-center gap-2 border-b border-line px-4 py-4 sm:px-6 sm:py-5">
-      <div class="relative w-full sm:w-64">
-        <svg class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-ink-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input
-          type="text"
-          placeholder="Buscar por nome ou CPF..."
-          class="h-9 w-full rounded-sm border border-line bg-white pr-3 pl-9 text-[13px] text-ink focus:border-brand focus:outline-none"
-          [ngModel]="busca()"
-          (ngModelChange)="busca.set($event)"
-        />
-      </div>
+  <app-tabela
+    chaveLinha="id"
+    [linhas]="revendedoras()"
+    [colunas]="colunas"
+    [filtros]="filtros"
+    [ordenacaoInicial]="ordenacaoInicial"
+    buscaPlaceholder="Buscar por nome ou CPF..."
+  >
+    <ng-template appCelula="saldoDevedor" let-r>
+      <span class="font-medium" [class]="r.saldoDevedor > 0 ? 'text-red-600' : 'text-ink'">
+        {{ r.saldoDevedor | currency: 'BRL' }}
+      </span>
+    </ng-template>
 
-      <select
-        [ngModel]="filtroStatus()"
-        (ngModelChange)="filtroStatus.set($event)"
-        class="h-9 rounded-sm border border-line bg-white px-2.5 text-[13px] text-ink focus:border-brand focus:outline-none"
+    <ng-template appCelula="diasAtraso" let-r>
+      <span class="text-ink-soft">{{ r.diasAtraso > 0 ? r.diasAtraso + ' dias' : '—' }}</span>
+    </ng-template>
+
+    <ng-template appCelula="status" let-r>
+      <span
+        class="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold tracking-wide"
+        [class]="badgeClasse(r.status)"
       >
-        <option value="TODOS">Todos os status</option>
-        <option value="EM_DIA">Em dia</option>
-        <option value="EM_ABERTO">Em aberto</option>
-        <option value="ATRASADA">Atrasada</option>
-      </select>
-    </div>
+        {{ statusRotulo(r.status) }}
+      </span>
+    </ng-template>
 
-    <div class="overflow-x-auto">
-      <table class="w-full border-collapse text-left">
-        <thead>
-          <tr class="bg-paper-soft text-[12px] tracking-wider text-ink-soft uppercase">
-            <th class="border-b border-line px-6 py-4 font-medium">
-              <button type="button" (click)="alternarOrdenacao('nome')" class="flex items-center gap-1 uppercase tracking-wider transition-colors" [class.text-brand]="sortColuna() === 'nome'">
-                Revendedora
-              </button>
-            </th>
-            <th class="border-b border-line px-6 py-4 text-right font-medium">
-              <button type="button" (click)="alternarOrdenacao('saldoDevedor')" class="flex w-full items-center justify-end gap-1 uppercase tracking-wider transition-colors" [class.text-brand]="sortColuna() === 'saldoDevedor'">
-                Saldo Devedor
-              </button>
-            </th>
-            <th class="border-b border-line px-6 py-4 text-right font-medium">
-              <button type="button" (click)="alternarOrdenacao('exposicaoMaleta')" class="flex w-full items-center justify-end gap-1 uppercase tracking-wider transition-colors" [class.text-brand]="sortColuna() === 'exposicaoMaleta'">
-                Exposição
-              </button>
-            </th>
-            <th class="border-b border-line px-6 py-4 text-center font-medium">
-              <button type="button" (click)="alternarOrdenacao('diasAtraso')" class="flex w-full items-center justify-center gap-1 uppercase tracking-wider transition-colors" [class.text-brand]="sortColuna() === 'diasAtraso'">
-                Atraso
-              </button>
-            </th>
-            <th class="border-b border-line px-6 py-4 text-center font-medium">Status</th>
-            <th class="border-b border-line px-6 py-4 text-center font-medium">Ação</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-line text-[14px] text-ink">
-          @for (r of revendedorasFiltradas(); track r.id) {
-            <tr class="cursor-pointer transition-colors hover:bg-paper-soft/50" (click)="abrirDetalhe(r)">
-              <td class="px-6 py-3">
-                <div class="flex items-center gap-3">
-                  <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-light font-brand text-sm font-bold text-brand">
-                    {{ r.nome.charAt(0) }}
-                  </div>
-                  <div>
-                    <p class="font-medium text-ink">{{ r.nome }}</p>
-                    <p class="text-[12.5px] text-ink-soft">{{ r.cpf }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-3 text-right font-medium" [class]="r.saldoDevedor > 0 ? 'text-red-600' : 'text-ink'">
-                {{ r.saldoDevedor | currency: 'BRL' }}
-              </td>
-              <td class="px-6 py-3 text-right text-ink-soft">{{ r.exposicaoMaleta | currency: 'BRL' }}</td>
-              <td class="px-6 py-3 text-center text-ink-soft">
-                {{ r.diasAtraso > 0 ? r.diasAtraso + ' dias' : '—' }}
-              </td>
-              <td class="px-6 py-3 text-center">
-                <span class="inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold tracking-wide" [class]="badgeClasse(r)">
-                  {{ statusLabel[status(r)] }}
-                </span>
-              </td>
-              <td class="px-6 py-3 text-center">
-                <button
-                  type="button"
-                  (click)="abrirDetalhe(r); $event.stopPropagation()"
-                  class="rounded-sm border border-brand px-3 py-1.5 text-[12px] font-medium text-brand transition-colors hover:bg-brand hover:text-white"
-                >
-                  Ver detalhes
-                </button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="6" class="px-6 py-16 text-center text-[14px] text-ink-soft">Nenhuma revendedora encontrada.</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
+    <ng-template appCelula="detalhes" let-r>
+      <button
+        type="button"
+        (click)="abrirDetalhe(r)"
+        class="rounded-sm border border-brand px-3 py-1.5 text-[12px] font-medium text-brand transition-colors hover:bg-brand hover:text-white"
+      >
+        Ver detalhes
+      </button>
+    </ng-template>
+  </app-tabela>
 }

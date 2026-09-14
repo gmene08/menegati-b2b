@@ -105,14 +105,13 @@
   </div>
 </div>
 
-<app-produto-tabela
+<app-tabela
+  chaveLinha="codigo"
   [itensPorPagina]="5"
   [linhas]="produtos()"
   [colunas]="colunas"
   [filtros]="filtrosTabela"
-
->
-</app-produto-tabela>
+></app-tabela>
 
 @if (produtoParaAjustar(); as produto) {
   <app-ajustar-quantidade-modal

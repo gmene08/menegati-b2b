@@ -1,7 +1,7 @@
 import { Directive, inject, input, TemplateRef } from '@angular/core';
 
 /**
- * Marca um `<ng-template>` como a célula de uma coluna da ProdutoTabela.
+ * Marca um `<ng-template>` como a célula de uma coluna da Tabela.
  * O nome casa com a `chave` de uma coluna `formato: 'template'`,
  * ou com a palavra reservada "acao" para a última coluna.
  */
